@@ -56,3 +56,14 @@ jobs:
         env:
           UI_BROWSER: firefox
         run: node scripts/ui_smoke.mjs
+      - name: Archive qualified source
+        if: matrix.python == '3.12'
+        run: git archive --format=tar.gz --output=dist/qualified-source.tar.gz HEAD
+      - name: Retain qualified source and installable packages
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualified-source-and-packages
+          path: dist/
+          retention-days: 7
+          if-no-files-found: error
