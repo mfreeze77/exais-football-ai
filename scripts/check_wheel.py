@@ -13,6 +13,9 @@ required = {
     "exais_football/static/app.js",
     "exais_football/static/review.js",
     "exais_football/static/ui.js",
+    "exais_football/static/taxonomy.js",
+    "exais_football/static/taxonomy.css",
+    "exais_football/static/tag-input.js",
 }
 wheels = sorted(Path("dist").glob("*.whl"))
 if not wheels:

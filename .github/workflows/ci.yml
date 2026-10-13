@@ -28,7 +28,7 @@ jobs:
       - name: Check source, tickets, and real media workflows
         run: |
           uv run ruff check .
-          uv run ruff format --check src tests
+          uv run ruff format --check src tests scripts docs/tickets/validate.py
           uv run python docs/tickets/validate.py
           uv run pytest -q
       - name: Build and inspect wheel
@@ -55,4 +55,27 @@ jobs:
         if: matrix.python == '3.12'
         env:
           UI_BROWSER: firefox
-        run: node scripts/ui_smoke.mjs
+          UI_ARTIFACT_DIR: ui-artifacts
+        run: |
+          for file in src/exais_football/static/*.js scripts/*.mjs; do node --check "$file"; done
+          node scripts/tag_input_test.mjs
+          node scripts/ui_smoke.mjs
+      - name: Retain synthetic browser qualification screenshots
+        if: always() && matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-qualification-screenshots
+          path: ui-artifacts/
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Archive qualified source
+        if: matrix.python == '3.12'
+        run: git archive --format=tar.gz --output=dist/qualified-source.tar.gz HEAD
+      - name: Retain qualified source and installable packages
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualified-source-and-packages
+          path: dist/
+          retention-days: 7
+          if-no-files-found: error

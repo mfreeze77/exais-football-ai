@@ -12,9 +12,10 @@
  * and KEEP_UI_ARTIFACTS=1 are optional. Dependencies are not app requirements.
  */
 import assert from "node:assert/strict";
+import { qualifyTaxonomy } from "./taxonomy_ui.mjs";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createServer } from "node:net";
 import { createRequire } from "node:module";
@@ -74,7 +75,13 @@ async function visible(selector) { await page.locator(selector).waitFor({ state:
 async function hidden(selector) { await page.locator(selector).waitFor({ state: "hidden" }); }
 async function saved() { await until(async () => (await page.locator("#draft-status").textContent()) === "All changes saved", "Review did not save"); }
 async function closeReview() { await page.locator("#review-close").click(); await hidden("#review-dialog"); }
-async function shot(name) { if (process.env.KEEP_UI_ARTIFACTS === "1") await page.screenshot({ path: path.join(workspace, `${name}.png`), fullPage: true }); }
+async function shot(name) {
+  if (process.env.KEEP_UI_ARTIFACTS === "1" || process.env.UI_ARTIFACT_DIR) {
+    const destination = process.env.UI_ARTIFACT_DIR || workspace;
+    await mkdir(destination, { recursive: true });
+    await page.screenshot({ path: path.join(destination, `${name}.png`), fullPage: true });
+  }
+}
 function passed(message) { console.log(`PASS ${message}`); }
 
 try {
@@ -283,15 +290,21 @@ try {
   await closeReview();
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.locator("#new-playlist").isVisible(), "Small-screen playlist creation inaccessible");
-  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "Small-screen page overflows horizontally");
+  await until(async () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "Small-screen page overflows horizontally after layout settles", 3000);
   await shot("04-small-screen");
   passed("archive/restore, tablet layout, small-screen playlist access");
+  await qualifyTaxonomy({ page, request, first, second, until, shot });
   assert.deepEqual(failures, [], "Browser runtime or CSP errors");
   console.log(`UI SMOKE PASSED (${browserName})`);
 } catch (error) {
   console.error(`UI SMOKE FAILED (${browserName}): ${error.stack || error.message}`);
   if (page && workspace) {
-    try { await page.screenshot({ path: path.join(workspace, "failure.png"), fullPage: true }); } catch {}
+    try {
+      console.error("Overflow diagnostics:", await page.evaluate(() => [...document.querySelectorAll("body *")].filter(node => node.getBoundingClientRect().right > innerWidth + 1).slice(0, 20).map(node => ({ tag: node.tagName, id: node.id, class: node.className, right: node.getBoundingClientRect().right, width: innerWidth }))));
+      const destination = process.env.UI_ARTIFACT_DIR || workspace;
+      await mkdir(destination, { recursive: true });
+      await page.screenshot({ path: path.join(destination, "failure.png"), fullPage: true });
+    } catch {}
   }
   if (serverLog) console.error(`Temporary server output:\n${serverLog}`);
   process.exitCode = 1;

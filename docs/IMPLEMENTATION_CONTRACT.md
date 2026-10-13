@@ -57,3 +57,12 @@ Deliver a polished local film-room UI: clip grid/list, search + filters, game/pl
 ## Testing and delivery
 
 Use synthetic FFmpeg video with an audio tone to verify import, range playback, persistence, trims, real export duration/audio and immutable source hash. Verify duplicate import, optimistic concurrency, invalid relationships, path traversal/unsafe uploads, wrong-source AI results and note timestamps. Preserve meaningful failures in jobs. Build/install wheel in an isolated environment and prove static assets are included. Automated UI smoke in a local headless browser if available; otherwise report that gate unrun. Test fixtures are generated into temporary directories. No real film, model weights, credentials or database enters git.
+
+## Schema-2 terminology extension (EFA-017)
+
+[TAG_TAXONOMY.md](TAG_TAXONOMY.md) specifies the additional owner-managed groups,
+alias namespace, preset lifecycle, and preview/apply routes. The existing clip
+PATCH, history, `/tags`, and search response shapes remain compatible. Clip writes
+and history restore now resolve current canonical names; previously recorded
+snapshots, original media, and frozen export jobs remain unchanged. This is an
+additive schema-2 upgrade, not full backup/restore or native/model qualification.
