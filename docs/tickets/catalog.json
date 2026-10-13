@@ -866,7 +866,7 @@
       "title": "Introduce reusable football tag groups and terminology",
       "milestone": "M2",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "catalog",
       "outcome": "Apply consistent labels across games while allowing the owner to use their own football vocabulary.",
       "scope": [
@@ -894,9 +894,9 @@
       ],
       "source_refs": [],
       "evidence": [
-        "Candidate PR #50: feat/efa-017-football-tag-taxonomy, based on merged M1 at 2ff774e5e11f4c4c13fcd5f809da0165ffd2ae6a.",
-        "Implementation and API/owner guide: docs/TAG_TAXONOMY.md.",
-        "Acceptance qualification is in progress; no completed browser or final-head CI claim yet."
+        "Qualified implementation: d99824fe11e90e383a83c47e70d6bb7645f4554d; PR #50 remains open and unmerged.",
+        "GitHub Actions run 38347274235 passed Python 3.11/3.12, all 124 Python tests, installed-wheel checks, and the original plus EFA-017 Firefox workflow.",
+        "All five acceptance checks map to executed tests in docs/EFA017_QUALIFICATION.md; usage and API are documented in docs/TAG_TAXONOMY.md."
       ],
       "github_issue": {
         "number": 17,
