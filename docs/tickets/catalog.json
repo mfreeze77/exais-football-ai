@@ -7,7 +7,7 @@
     {
       "id": "M1",
       "title": "Working local film library and safe external adapter foundations",
-      "status": "in_progress",
+      "status": "implemented",
       "exit_criteria": [
         "Import existing clips, preserve originals, trim/label/review/retrieve them, manage playlists, and export audio-preserving MP4s through the local UI.",
         "Qualify local API, persistence, provenance, and real FFmpeg behavior; verify installed-package assets.",
@@ -151,7 +151,7 @@
       "title": "Establish the local application and capability boundary",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "foundation",
       "outcome": "Start a private film room on one computer with actionable setup feedback and no automatic external processing.",
       "scope": [
@@ -173,7 +173,12 @@
         "Do not confuse an importable Python dependency with a qualified native application or trained model."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "app.py, cli.py and config.py: loopback startup, health, body/origin limits, lifecycle and instance lock; installed-wheel startup checked.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 1,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/1"
@@ -185,7 +190,7 @@
       "title": "Persist film records and immutable source provenance",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "storage",
       "outcome": "Keep every review attached to the correct original film across application restarts.",
       "scope": [
@@ -210,7 +215,12 @@
         "Multiple-source and multi-angle models may require later additive migrations."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "db.py and service.py: SQLite foreign keys, immutable media fields, source hashes and restart persistence; tests/test_api.py passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 2,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/2"
@@ -222,7 +232,7 @@
       "title": "Import existing clips safely with duplicate detection",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "ingest",
       "outcome": "Bring the owner's existing game clips into the library without damaging originals or multiplying identical imports.",
       "scope": [
@@ -247,7 +257,12 @@
         "Source copying requires temporary space; failure cleanup must preserve existing clips."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "service.py: real media import, duplicate detection and unsafe-input checks; tests/test_import_failures.py reproduces concurrent rollback without deleting a reused source.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 3,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/3"
@@ -259,7 +274,7 @@
       "title": "Save metadata with optimistic concurrency and revision restore",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "catalog",
       "outcome": "Edit labels confidently and recover earlier review choices without silently losing another tab's changes.",
       "scope": [
@@ -284,7 +299,12 @@
         "A restored timestamp must still satisfy the immutable source duration."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "service.py and models.py: atomic versioned edits, two competing writers, normalization and new-revision restore; tests/test_api.py passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 4,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/4"
@@ -296,7 +316,7 @@
       "title": "Review source video with a non-destructive selected interval",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "playback",
       "outcome": "Tighten each clip for future watching while keeping the complete source available.",
       "scope": [
@@ -322,7 +342,12 @@
         "Very tight trims can remove pre-snap alignment needed by later CV analysis."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "API range/HEAD and original-hash tests passed; real Firefox tested saved selection, looping, slow playback and nominal frame stepping.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 5,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/5"
@@ -334,7 +359,7 @@
       "title": "Add durable timed coaching notes",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "review",
       "outcome": "Record what to watch and reopen the relevant moment without relying on filenames.",
       "scope": [
@@ -360,7 +385,12 @@
         "Deleting a note must never delete film."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Timed/untimed note storage, boundary/non-finite/ownership checks passed; real Firefox tested note creation, seeking and durable retrieval. User content uses DOM text APIs.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 6,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/6"
@@ -372,7 +402,7 @@
       "title": "Find film by search and combined football filters",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "catalog",
       "outcome": "Retrieve useful clips by what they show instead of browsing an expanding folder tree.",
       "scope": [
@@ -398,7 +428,12 @@
         "Filter state must not imply AI labels have become accepted human tags."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Combined filter/search and archive API checks passed; real Firefox tested favorites, note search and library retrieval. Stable pagination uses updated_at/id ordering.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 7,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/7"
@@ -410,7 +445,7 @@
       "title": "Manage games and a simple manually maintained roster",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "catalog",
       "outcome": "Associate clips with the game and people the owner knows.",
       "scope": [
@@ -436,7 +471,12 @@
         "The owner supplies roster identity in the first milestone."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Game/player creation and validated assignments passed in the API suite and real Firefox batch/review workflow.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 8,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/8"
@@ -448,7 +488,7 @@
       "title": "Favorite and archive clips without losing film",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "catalog",
       "outcome": "Keep the active library focused while retaining earlier clips for later retrieval.",
       "scope": [
@@ -474,7 +514,12 @@
         "Derived statistics must use the documented active-clip population."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Favorite/archive versioned writes and source retention passed in API tests; real Firefox tested favorites, archive and restore.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 9,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/9"
@@ -486,7 +531,7 @@
       "title": "Create ordered playlists and watch a focused set of clips",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "playlists",
       "outcome": "Return to a useful sequence of plays without copying video files into more folders.",
       "scope": [
@@ -513,7 +558,12 @@
         "Empty playlists need a useful state."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Playlist validation/atomic replacement passed; real Firefox tested selection across search, saved order, sequential review and archived presentation.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 10,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/10"
@@ -525,7 +575,7 @@
       "title": "Run durable audio-preserving trim exports",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "media",
       "outcome": "Produce a tightened MP4 that remains tied to the exact review settings used to create it.",
       "scope": [
@@ -554,7 +604,12 @@
       "source_refs": [
         "FCV-OVERLAY"
       ],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Real FFmpeg duration/audio/source-hash and frozen-version export checks passed. The job rejects a source changed after its precheck. Firefox downloaded and probed the exported MP4.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 11,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/11"
@@ -566,7 +621,7 @@
       "title": "Provide safe external Kinovea launch and KVA preservation",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "integrations",
       "outcome": "Keep Kinovea available for detailed technique review while retaining its sidecar with the library clip.",
       "scope": [
@@ -597,7 +652,12 @@
         "KIN-2023",
         "KIN-2025"
       ],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Safe XML, byte preservation and mocked Windows argv checks passed; tests/test_native_handoff.py verifies real copy/hash/no-overwrite races and injected I/O failures. Actual Windows Kinovea remains EFA-041 and unrun.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 12,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/12"
@@ -609,7 +669,7 @@
       "title": "Import and review football-cv position suggestions safely",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "integrations",
       "outcome": "Attach external analysis to the right clip while keeping model suggestions distinct from coaching labels.",
       "scope": [
@@ -641,7 +701,12 @@
         "FCV-README",
         "FCV-DETECT"
       ],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Source-bound bundle validation, immutable imported payload and separate review checks passed in tests/test_integrations.py and tests/test_api.py. Actual model execution/accuracy remains M3 and unrun.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 13,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/13"
@@ -653,7 +718,7 @@
       "title": "Deliver the complete same-origin local film-room interface",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "ui",
       "outcome": "Complete the import, tighten, label, note, playlist, and export journey through one usable local interface.",
       "scope": [
@@ -689,7 +754,12 @@
         "Different browser codecs and small displays require later expanded qualification."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "All eight real Firefox workflow groups passed in scripts/ui_smoke.mjs, including text safety, drafts/409, import/review/export, playlists and responsive layout; JS/static checks passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 14,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/14"
@@ -701,7 +771,7 @@
       "title": "Qualify source safety and the complete local media workflow",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "quality",
       "outcome": "Establish evidence that core editing and export preserve the owner's film and reject unsafe requests.",
       "scope": [
@@ -733,7 +803,12 @@
         "Browser smoke is required when a local headless browser is available; otherwise record it unrun."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "All 94 Python tests passed locally and in the Python 3.11/3.12 CI matrix; real Firefox workflow passed. Scope, reproduced failures and remaining limits are in docs/QUALIFICATION.md.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 15,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/15"
@@ -745,7 +820,7 @@
       "title": "Package the first release and publish an honest handoff",
       "milestone": "M1",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "implemented",
       "area": "release",
       "outcome": "Make the first working milestone installable and make its capabilities and remaining gates unambiguous.",
       "scope": [
@@ -774,7 +849,12 @@
         "User authorization covers pushing progress and opening a PR, not automatic merge."
       ],
       "source_refs": [],
-      "evidence": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Wheel/sdist build, isolated installation, startup and every packaged UI asset passed locally and in CI. All 48 tickets/255 acceptance checks/mappings/DAG validate. PR #49 is the review handoff; no merge performed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
       "github_issue": {
         "number": 16,
         "url": "https://github.com/mfreeze77/exais-football-ai/issues/16"

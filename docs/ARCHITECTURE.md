@@ -42,7 +42,7 @@ M1 stores one original source association per clip. EFA-019 introduces an explic
 
 ## Import and publication
 
-Import is a staged operation: receive bounded bytes into a managed temporary location, probe them as media, compute the source hash, check for a duplicate, then publish the managed source and record. Any failure must leave either a valid complete import or a documented cleanup/recovery state, not a half-valid clip.
+Import is a staged operation: receive bounded bytes into a managed temporary location, compute the source hash and check for a duplicate, probe new source bytes as media, then publish the managed source and record under a write transaction. Any failure must leave either a valid complete import or a documented cleanup/recovery state, not a half-valid clip. Once a content-addressed original is published, catalog rollback retains it so a concurrent successful import cannot lose a reused file. Subsequent imports verify retained bytes before reuse; automatic orphan cleanup remains a recovery ticket.
 
 The client filename is retained for display. It must not dictate a destination path. Resolving an ID to a managed path is a server responsibility, and containment is checked after resolution. Both API validation and subprocess construction must treat uploaded media as untrusted input.
 
@@ -50,7 +50,7 @@ The thumbnail is a disposable derived convenience. A missing thumbnail cannot ca
 
 ## Editing and concurrency
 
-Every editable clip request includes its current integer version. A successful transaction applies validated relationships and interval bounds, saves a revision, increments the version, and updates the modification time. A stale version returns 409. The UI must preserve the user's unsaved values and explain the conflict.
+An OS-level instance lock permits one running app to own each data directory, avoiding competing export workers. Every editable clip request includes its current integer version. A successful transaction applies validated relationships and interval bounds, saves a revision, increments the version, and updates the modification time. A stale version returns 409. The UI preserves the user's unsaved values and explains the conflict. Playlist order currently uses whole-list replacement without a version token; shared multi-user playlist editing is outside M1.
 
 Tag/player arrays use replacement semantics in M1. The UI therefore sends the complete intended list rather than interpreting a partial selection as an append. EFA-018 adds explicit add/remove/replace operations for batches, with preview and recovery.
 

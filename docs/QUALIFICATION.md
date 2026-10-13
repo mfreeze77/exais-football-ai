@@ -1,6 +1,10 @@
 # First-milestone qualification
 
-Candidate: `build/film-library-foundation`, application version **0.1.0**. Local verification was executed on **2026-10-13**, using Python **3.12.14**, FFmpeg/ffprobe **6.1.1**, and the dependencies in `uv.lock`. The PR is the review boundary; tickets stay open until an accepted merge.
+Candidate: `build/film-library-foundation`, application version **0.1.0**, [PR #49](https://github.com/mfreeze77/exais-football-ai/pull/49). The complete code was tested at [commit 153e5073](https://github.com/mfreeze77/exais-football-ai/commit/153e5073e918dc06d28b4615f2d7749ed9e5b62b); the following documentation update records those results without changing runtime code. Local verification was executed on **2026-10-13**, using Python **3.12.14**, FFmpeg/ffprobe **6.1.1**, and the dependencies in `uv.lock`. Tickets stay open until an accepted merge.
+
+## GitHub Actions result
+
+**Passed on Python 3.11 and 3.12, including the real Firefox workflow.** Both the [push run](https://github.com/mfreeze77/exais-football-ai/actions/runs/38332709399) and [PR run](https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633) completed successfully at the tested code commit. The [Python 3.12 job log](https://github.com/mfreeze77/exais-football-ai/actions/runs/38332709399/job/115085842633) records the installed-wheel check and all eight browser workflow groups, ending in `UI SMOKE PASSED (firefox)`.
 
 ## Executed local checks
 
@@ -46,13 +50,24 @@ Native-review tests use real filesystem copies and collision behavior while stub
 
 Tests reject foreign Host/Origin values and cross-site requests, bound both declared and chunked request bodies, and check managed-path containment. Source and job download routes resolve opaque IDs. The CLI allows loopback addresses only. This is a single-owner local application, not a qualified remote service.
 
-## Browser gate
+## Browser gate — passed in GitHub Actions
 
 The optional `scripts/ui_smoke.mjs` starts its own temporary server and data directory, generates two clips with audio, and exercises the complete browser workflow. It also checks draft/conflict handling, HTML-as-text rendering, real playback/looping, downloads, playlists, archive, and responsive layout.
 
 The local environment could not run a browser content process. Chromium installation returned truncated archives. Firefox downloaded successfully but failed after Juggler startup with `/proc/self/uid_map: EPERM` and content-process signal 11 exits. The attempts were stopped without changing sandbox controls. **No local real-browser or screenshot pass is claimed.**
 
-GitHub Actions includes a Python 3.12 Firefox run using Playwright 1.62.1. Its result is pending the first remote push; the PR will record that result before this gate is claimed as passed. The Python 3.11/3.12 matrix also runs source checks, real media tests, ticket validation, wheel build, and installed-asset verification.
+GitHub Actions resolved the local environment blocker. Its Python 3.12 Firefox run using Playwright 1.62.1 **passed**, with these observed workflow groups:
+
+1. Usable empty library, local assets, and initial connection.
+2. Game/player creation, batch upload progress, game assignment, and duplicate detection.
+3. Non-destructive trim, football labels, safe text rendering, slow playback, selection loop, and nominal frame step.
+4. Source-relative note persistence/seeking and explicit keep/discard draft handling.
+5. Optimistic version conflict preserving the draft, followed by explicit reload.
+6. Pending export polling, browser download, FFprobe duration/audio checks, and preserved source hash.
+7. Favorites, note search, playlist selection across search, ordering, and sequential review.
+8. Archive/restore, tablet layout, and small-screen playlist access.
+
+The Python 3.11/3.12 matrix also passed source checks, all 94 real-media/API/adapter tests, ticket validation, wheel build, and installed-asset verification. This establishes the tested browser workflow on the CI environment; it does not substitute for the remaining native desktop/model gates below.
 
 ## Explicit remaining qualification
 

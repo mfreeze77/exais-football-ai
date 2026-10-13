@@ -196,6 +196,8 @@ or drag gestures for essential operations.
 
 ## Optional browser verification
 
+The first candidate passed this complete Firefox workflow in [GitHub Actions](https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633) at commit `153e5073e918dc06d28b4615f2d7749ed9e5b62b`. See [qualification evidence](QUALIFICATION.md) for the eight observed workflow groups and remaining platform/model gates.
+
 `scripts/ui_smoke.mjs` is an optional real-browser workflow test. It requires
 Node, the Python application's dependencies, FFmpeg/ffprobe, and Playwright with
 a browser. These are test tools, not frontend runtime dependencies. One setup
