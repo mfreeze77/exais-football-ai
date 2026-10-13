@@ -26,8 +26,22 @@ jobs:
           root = pathlib.Path('_recovery')
           paths = sorted(root.glob('*.b64'))
           assert len(paths) == 110, len(paths)
-          encoded = ''.join(p.read_text().strip() for p in paths)
-          print('Encoded length:', len(encoded), flush=True)
+          repairs = {
+              'p026b.b64': ('cde3a928b57984b2675c3c25e7742e40eaa59b465cb4bc00a2475e7405adf9cc', [(1492, 1492, '', 'y')]),
+              'p029a.b64': ('86de2ea558a926dbbefe0a88b21bb60bc617885f526a5ba975e377635bc9a4bc', [(86, 86, '', 'O'), (87, 88, 'p', ''), (1685, 1685, '', 'x')]),
+          }
+          parts = []
+          for path in paths:
+              text = path.read_text().strip()
+              if path.name in repairs:
+                  digest, edits = repairs[path.name]
+                  assert hashlib.sha256(text.encode()).hexdigest() == digest
+                  for start, end, old, new in reversed(edits):
+                      assert text[start:end] == old
+                      text = text[:start] + new + text[end:]
+              parts.append(text)
+          encoded = ''.join(parts)
+          assert len(encoded) == 142372, len(encoded)
           raw = gzip.decompress(base64.b64decode(encoded, validate=True))
           expected = 'fba5be6505cb8ac748a3c556092dfa5b0ef9e35bbba497e636b93ea55734b287'
           assert len(raw) == 439745 and hashlib.sha256(raw).hexdigest() == expected
