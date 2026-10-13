@@ -2,39 +2,42 @@
 
 ## Published source, not a completed release
 
-PR #50 (EFA-017) was merged at `89da49bbe6388d630f1f1134fbe4df57983af32a`.
-PR #51 now contains the recovered implementation source at `07699bd202b620566903bfc5dd7441f3bfed61af`, rather than only a progress document. It targets `main`.
+PR #50 (EFA-017) was merged at `89da49bbe6388d630f1f1134fbe4df57983af32a`. PR #51 contains the recovered implementation source and targets main. Publication is no longer blocked on a local patch.
 
-The source was restored from the exact 439745-byte local candidate patch with SHA-256 `fba5be6505cb8ac748a3c556092dfa5b0ef9e35bbba497e636b93ea55734b287`. [Recovery run 38476746395](https://github.com/mfreeze77/exais-football-ai/actions/runs/38476746395) verified the checksum, applied the patch, passed locked Python tests/lint/format/build and published source to the feature branch. Transport files were removed. The temporary publishing workflow is removed in the following verification commit; normal CI is read-only.
+The exact 439745-byte candidate patch has SHA-256 `fba5be6505cb8ac748a3c556092dfa5b0ef9e35bbba497e636b93ea55734b287`. [Recovery run 38476746395](https://github.com/mfreeze77/exais-football-ai/actions/runs/38476746395) verified that checksum, applied the patch, passed locked Python tests/lint/format/build and published `07699bd202b620566903bfc5dd7441f3bfed61af`. A downloaded source comparison confirmed all 69 source and test files were byte-identical to the recovered candidate. Temporary transport and the one-time publishing workflow are removed. Normal CI has read-only repository permissions.
 
-The candidate has 222 Python tests (124 retained baseline plus new study, recovery, CV, KVA, and native/CLI contract tests). Re-running the local suite during recovery passed all 222. This does not establish actual model accuracy or native application interoperability.
+## Executed qualification
 
-## Delivered implementation areas
+[Verification run 38477281938](https://github.com/mfreeze77/exais-football-ai/actions/runs/38477281938) passed on source commit `56194399af6eff5cc9fd2cb807128bffcc1c5e81`:
+
+- Both Python 3.11 and 3.12 jobs, including the 222-test suite, lint, formatting, ticket validation, source/wheel builds and isolated installed-app checks.
+- The original Firefox film-room/taxonomy workflow.
+- The additional `scripts/backlog_ui.mjs` workflow: bulk preview/apply/undo, coaching-note preservation, source-sharing cuts, comparison anchors, exact decoded frames, saved drawings, timeline entries, no implicit model execution, saved collections, frozen sessions/watch-again, verified backup and responsive dialog geometry.
+
+The latest documentation commit changes no runtime or test source. Its own final-head Actions run remains the merge gate. Screenshots were inspected for comparison controls, drawing controls and small-screen recovery. This is not a complete accessibility audit or representative-film evaluation. Timeline entry creation is tested; the screenshot does not prove every lazy-loaded image was decoded at capture time.
+
+The suite retains the 124-test baseline and adds study, recovery, CV, KVA and native/CLI contract tests. Native/CLI fixtures are not a running native Kinovea application. Model integration tests do not establish real-model accuracy. An existing Starlette test-client deprecation warning is not suppressed.
+
+## Implementation included
 
 - Previewed, version-checked all-or-nothing bulk edits and recoverable undo; independent cuts sharing immutable original media.
-- Decoded frame indexes, timeline previews, source-relative drawings and still images, saved comparisons, dynamic collections and frozen resumable sessions.
+- Decoded-frame indexes, timeline previews, source-relative drawing revisions and annotated stills, saved comparisons, dynamic collections and frozen resumable sessions.
 - Versioned KVA import plans, explicit reconciliation and external comparison handoff.
-- Optional configured CV environment, reviewed calibration/pre-snap inputs, persistent jobs, source-bound artifacts, correction/identity decisions, audio-preserving overlays and evaluation utilities.
-- Full-library backup/verification, create-only staged restore, portable packages, integrity checks, derived-file cleanup and local launch commands.
+- Explicit CV environment configuration, calibration/pre-snap checks, persistent jobs, source-bound artifacts, separate correction/identity decisions, audio-preserving overlays and evaluation utilities.
+- Full-library backup/verification, create-only staged restore, portable packages, integrity checks, protected derived-file cleanup and local launch commands.
 
-Open **Film-study tools** in the sidebar. Select clips before using a tool: one for drawing/calibration/KVA, two for comparisons, multiple for bulk edits. Bulk preview never writes; applying the preview is an atomic transaction. Undo refuses incompatible later edits. Preserve the original workspace while first testing an upgraded copy.
+Open **Film-study tools** in the sidebar. Select one clip for drawing/calibration/KVA, two for comparisons, or multiple for bulk edits. Preview never writes; applying a bulk preview is an atomic transaction. Undo refuses incompatible later edits. First evaluate an upgraded copy rather than your only film library.
 
-## Gates that remain open
+## Open backlog acceptance
 
-This delivery is not a declaration that EFA-018 through EFA-048 are all accepted. Their individual checks remain open until the code and executed evidence meet each complete ticket scope.
+This delivery publishes implemented work; it does not declare all EFA-018 through EFA-048 accepted. Existing ticket checkboxes are unchanged pending per-ticket acceptance reconciliation. Do not read an uncompleted historical ticket as proof that no code exists, or treat this source delivery as proof every checkbox has passed.
 
-- Native Windows Kinovea round trips, supported-version compatibility and native comparison launch.
-- Real pinned football-cv inference, hardware/platform behavior, representative owner-approved film and measured accuracy.
-- Remaining calibration-transfer and tracking-quality enhancements.
-- Desktop installer builds, signing/notarization, native macOS/Windows qualification.
-- Large-library performance, complete accessibility/media-matrix evaluation and final release acceptance.
-
-The new `scripts/backlog_ui.mjs` is an additional synthetic Firefox integration gate alongside the original film-room/taxonomy workflow. Consult the exact PR-head Actions run for its executed result; merely adding the script is not passing evidence. It checks bulk preview/apply/undo and note preservation, source-sharing cuts, comparison anchors, actual decoded frames, saved drawings, timeline previews, no implicit model execution, saved collections, frozen sessions, verified backup and responsive layout.
+Remaining work includes native Windows/Kinovea round trips and supported-version qualification; actual pinned CV inference and owner-approved film evaluation; calibration-transfer/tracking-quality enhancements; desktop installer builds and signing/notarization; large-library performance; complete accessibility/media-matrix evaluation; and final release acceptance. These are not silently replaced with synthetic tests.
 
 ## Recovery and integration safety
 
-Original media is not rewritten. Source-relative timing and source hashes bind analysis and drawings. Human identities are separate from anonymous model tracking IDs. Starting the app does not acquire model weights or call an external model service. The model environment must be explicitly configured by the owner.
+Original media is not rewritten. Source-relative timing and hashes bind drawings and analysis. Human roster identities remain separate from anonymous model track IDs. Starting the app does not acquire model weights or call an external model service; configuration and analysis are explicit owner actions.
 
-Full backup covers required film and catalog content; the older schema-2 migration backup was database-only. Restore first previews archive identity, then requires `--execute --expected-sha256` into a new destination. Existing destinations are rejected. Use `exais-football restore --help` and `exais-football cv-configure --help` for the explicit command contracts.
+Full backup covers required film and catalog content. The earlier schema-2 migration backup was database-only. Restore first previews archive identity, then requires `--execute --expected-sha256` into a new destination; an existing destination is refused. Use `exais-football restore --help` and `exais-football cv-configure --help` for the explicit CLI contracts.
 
-The runtime API describes its new request models at `/docs` and `/openapi.json`. Route modules are `study_routes.py`, `kva_routes.py`, `cv_routes.py`, and `work_routes.py`. Schema, ownership and error cases are exercised in `tests/test_study.py`, `tests/test_kva_review.py`, `tests/test_cv_workflow.py`, `tests/test_recovery.py` and `tests/test_cli_native.py`.
+The same-origin API schema is served at `/api/openapi.json`; interactive `/docs` and `/redoc` pages are disabled. New routes are defined in `study_routes.py`, `kva_routes.py`, `cv_routes.py` and `work_routes.py`; validation and error cases are exercised in the corresponding study, KVA, CV, recovery and native/CLI test modules.
