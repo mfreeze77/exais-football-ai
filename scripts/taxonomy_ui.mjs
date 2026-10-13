@@ -54,6 +54,18 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
   await pick("presets", "Linebacker focus");
   await page.locator("#tax-description").fill("Read, react, pursue");
   await submit();
+  // Generic form labels stack vertically; preset checkboxes must remain beside
+  // their wrapped text on both desktop and small viewports.
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.waitForFunction(() => [...document.querySelectorAll(".taxonomy-checklist label")].every(label => {
+      const box = label.querySelector("input").getBoundingClientRect();
+      const text = label.querySelector("span").getBoundingClientRect();
+      return getComputedStyle(label).flexDirection === "row" && box.width <= 24 &&
+        text.left >= box.right && text.right <= label.getBoundingClientRect().right + 1;
+    }), null, { timeout: 3000 });
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await shot("05-taxonomy-presets");
   await close();
 

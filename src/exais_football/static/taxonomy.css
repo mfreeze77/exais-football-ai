@@ -12,7 +12,9 @@
   #taxonomy-editor h3, .taxonomy-preview h4 { overflow-wrap: anywhere; }
   .taxonomy-checklist { border: 1px solid var(--line); border-radius: 8px; max-height: 250px; overflow-y: auto; padding: 12px; }
   .taxonomy-checklist legend { padding-inline: 4px; }
-  .taxonomy-checklist label, .taxonomy-alias { display: flex; align-items: center; gap: 10px; padding: 7px 0; overflow-wrap: anywhere; }
+  .taxonomy-checklist label, .taxonomy-alias { display: flex; flex-direction: row; align-items: center; gap: 10px; padding: 7px 0; overflow-wrap: anywhere; }
+  .taxonomy-checklist input[type="checkbox"] { flex: 0 0 auto; }
+  .taxonomy-checklist label > span { min-width: 0; }
   .taxonomy-alias { flex-wrap: wrap; }
   .taxonomy-aliases { margin-top: 22px; }
   .taxonomy-review { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 10px; min-width: 0; }
