@@ -8,20 +8,71 @@ permissions:
 jobs:
   recover:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          persist-credentials: false
-      - name: Preserve exact previous source and transport for verification
-        run: |
-          git archive --format=tar.gz --output="$RUNNER_TEMP/current-source.tar.gz" HEAD
-          tar -czf "$RUNNER_TEMP/prior-transport.tar.gz" _recovery
-      - uses: actions/upload-artifact@v4
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
         with:
-          name: backlog-recovery-context
+          python-version: '3.12'
+      - name: Verify exact preserved patch before applying any source changes
+        run: |
+          python - <<'PY'
+          import base64, gzip, hashlib, os, pathlib
+          root = pathlib.Path('_recovery')
+          paths = sorted(root.glob('*.b64'))
+          assert len(paths) == 110, len(paths)
+          encoded = ''.join(p.read_text().strip() for p in paths)
+          print('Encoded length:', len(encoded), flush=True)
+          raw = gzip.decompress(base64.b64decode(encoded, validate=True))
+          expected = 'fba5be6505cb8ac748a3c556092dfa5b0ef9e35bbba497e636b93ea55734b287'
+          assert len(raw) == 439745 and hashlib.sha256(raw).hexdigest() == expected
+          pathlib.Path(os.environ['RUNNER_TEMP'], 'candidate.patch').write_bytes(raw)
+          print('Exact original candidate patch verified:', expected)
+          PY
+          git apply --index --check "$RUNNER_TEMP/candidate.patch"
+          git apply --index "$RUNNER_TEMP/candidate.patch"
+          git rm -r -- _recovery
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+      - name: Qualify recovered candidate in locked environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install uv
+          uv sync --locked --extra dev --python python
+          uv run ruff check .
+          uv run ruff format --check src tests scripts docs/tickets/validate.py
+          uv run python docs/tickets/validate.py
+          uv run pytest -q
+          uv run python -m build
+          python scripts/check_wheel.py
+      - name: Publish source only to existing feature branch without overwriting concurrent work
+        run: |
+          branch='build/backlog-film-study-cv-recovery'
+          test "$(git ls-remote origin "refs/heads/$branch" | cut -f1)" = "$GITHUB_SHA"
+          git diff --exit-code
+          test -z "$(git diff --cached --name-only -- .github/workflows)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Publish recovered backlog implementation: film study, CV integration, and recovery' -m 'Restores the exact 439745-byte candidate patch fba5be6505cb8ac748a3c556092dfa5b0ef9e35bbba497e636b93ea55734b287 after locked-environment tests and build. Does not claim all backlog acceptance or native/model qualification. Removes transport files; PR #51 remains the integration gate.'
+          git push origin "HEAD:refs/heads/$branch"
+          git log -1 --format='%H %T' > "$RUNNER_TEMP/published-revision.txt"
+      - name: Preserve recovery evidence
+        if: always()
+        run: |
+          git archive --format=tar.gz --output="$RUNNER_TEMP/recovery-source.tar.gz" HEAD
+          git status --short > "$RUNNER_TEMP/recovery-status.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backlog-recovery-evidence
           path: |
-            ${{ runner.temp }}/current-source.tar.gz
-            ${{ runner.temp }}/prior-transport.tar.gz
+            ${{ runner.temp }}/recovery-source.tar.gz
+            ${{ runner.temp }}/recovery-status.txt
+            ${{ runner.temp }}/published-revision.txt
           retention-days: 3
+          if-no-files-found: error
