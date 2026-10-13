@@ -23,6 +23,17 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
   };
   const open = async () => { await page.locator("#manage-tags").click(); await settled("Terminology revision"); };
   const close = async () => { await page.locator("#taxonomy-close").click(); await manager.waitFor({ state: "hidden" }); };
+  const settledLayout = async width => {
+    await until(async () => manager.evaluate((dialog, targetWidth) => {
+      const bounds = dialog.getBoundingClientRect();
+      const editor = document.querySelector("#taxonomy-editor").getBoundingClientRect();
+      const columns = getComputedStyle(document.querySelector(".taxonomy-layout")).gridTemplateColumns.split(" ").length;
+      return innerWidth === targetWidth && bounds.width >= Math.min(1000, targetWidth - 60) &&
+        bounds.right <= targetWidth + 1 && editor.width >= Math.min(400, targetWidth - 100) &&
+        columns === (targetWidth <= 700 ? 1 : 2);
+    }, width), `Terminology layout did not settle at ${width}px`, 5000);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  };
   await page.setViewportSize({ width: 1440, height: 1000 });
   await open();
   await selectKind("groups");
@@ -58,6 +69,7 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
   // their wrapped text on both desktop and small viewports.
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
+    await settledLayout(width);
     await page.waitForFunction(() => [...document.querySelectorAll(".taxonomy-checklist label")].every(label => {
       const box = label.querySelector("input").getBoundingClientRect();
       const text = label.querySelector("span").getBoundingClientRect();
@@ -66,6 +78,7 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
     }), null, { timeout: 3000 });
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
+  await settledLayout(1440);
   await shot("05-taxonomy-presets");
   await close();
 
@@ -116,6 +129,7 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
   await page.locator('#taxonomy-form button[type="submit"]').click();
   await settled("Preview ready");
   await page.setViewportSize({ width: 820, height: 1180 });
+  await settledLayout(820);
   await shot("06-taxonomy-preview");
   assert.ok(await manager.evaluate(node => node.scrollWidth <= node.clientWidth + 1), "Taxonomy preview overflows on tablet");
   await page.locator("#taxonomy-apply").click();
@@ -159,6 +173,7 @@ export async function qualifyTaxonomy({ page, request, first, second, until, sho
   await page.locator("#choice-dialog").getByRole("button", { name: "Discard draft", exact: true }).click();
   await settled("Terminology revision");
   await page.setViewportSize({ width: 390, height: 844 });
+  await settledLayout(390);
   await shot("07-taxonomy-small-screen");
   assert.ok(await manager.evaluate(node => node.scrollWidth <= node.clientWidth + 1), "Taxonomy editor overflows on small screens");
   await close();
