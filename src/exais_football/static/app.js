@@ -1,6 +1,7 @@
 import { api, upload, localURL, queryString } from "./api.js";
 import { $, $$, el, icon, button, iconButton, duration, filmTime, friendly, dateLabel, fillSelect, toast, choose, debounce, mountIcons } from "./ui.js";
 import { ReviewController } from "./review.js";
+import { StudyTools } from "./study-ui.js";
 import { TaxonomyManager } from "./taxonomy.js";
 
 const state = {
@@ -31,6 +32,13 @@ const terminology = new TaxonomyManager(async result => {
   await loadTags(preferred);
   await Promise.all([loadClips(), loadStats()]);
 });
+
+const studyTools = new StudyTools({
+  catalog: () => state, filters: () => filterValues(), review,
+  onChanged: async () => { await Promise.all([loadCatalogs(), loadClips(), loadStats(), loadTags()]); },
+});
+$("#open-study-tools").addEventListener("click", () => studyTools.open());
+$("#review-study-tools").addEventListener("click", () => studyTools.open(review.clip?.id));
 
 function reportBackgroundFailures(results) {
   const failure = results.find(item => item.status === "rejected");

@@ -79,7 +79,7 @@ class Catalog:
         if row is None:
             raise CatalogError("clip_not_found", "This clip does not exist", 404)
         clip = dict(row)
-        del clip["asset_id"]
+        clip["source_asset_id"] = clip.pop("asset_id")
         for field in ("favorite", "archived", "has_audio"):
             clip[field] = bool(clip[field])
         clip["duration"] = clip["end_seconds"] - clip["start_seconds"]
@@ -372,9 +372,13 @@ class Catalog:
 
     def notes(self, clip_id: str) -> list[dict]:
         with self.db.connection() as connection:
-            self._require(connection, "clips", clip_id)
+            clip = self._clip(connection, clip_id)
             return [
-                dict(row)
+                {
+                    **dict(row),
+                    "source_asset_id": clip["source_asset_id"],
+                    "source_sha256": clip["source_sha256"],
+                }
                 for row in connection.execute(
                     "SELECT * FROM notes WHERE clip_id=? ORDER BY at_seconds,created_at", (clip_id,)
                 )
@@ -398,7 +402,11 @@ class Catalog:
                 "INSERT INTO notes(id,clip_id,body,at_seconds,created_at) VALUES(?,?,?,?,?)",
                 list(record.values()),
             )
-            return record
+            return {
+                **record,
+                "source_asset_id": clip["source_asset_id"],
+                "source_sha256": clip["source_sha256"],
+            }
 
     def delete_note(self, clip_id: str, note_id: str) -> None:
         with self.db.connection(write=True) as connection:

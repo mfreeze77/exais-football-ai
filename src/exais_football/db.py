@@ -9,9 +9,10 @@ from contextlib import closing, contextmanager
 from pathlib import Path
 from uuid import uuid4
 
+from .evolution import migrate_v3
 from .tagging import migrate_v2
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 SCHEMA = """
 BEGIN IMMEDIATE;
 CREATE TABLE IF NOT EXISTS games (
@@ -120,9 +121,14 @@ class Database:
                         if statement and statement not in {"BEGIN IMMEDIATE", "COMMIT"}:
                             connection.execute(statement)
                     migrate_v2(connection)
+                    migrate_v3(connection)
                 elif current == 1:
                     self._backup_v1()
                     migrate_v2(connection)
+                    migrate_v3(connection)
+                elif current == 2:
+                    self._backup_catalog(2)
+                    migrate_v3(connection)
                 elif current != SCHEMA_VERSION:
                     raise RuntimeError("Unsupported catalog schema; migration was stopped")
                 connection.commit()
@@ -174,6 +180,23 @@ class Database:
                 source.backup(target)
                 if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                     raise RuntimeError("The pre-migration catalog backup failed verification")
+        except BaseException:
+            path.unlink(missing_ok=True)
+            raise
+
+    def _backup_catalog(self, version: int) -> None:
+        path = self.path.with_name(f"catalog.pre-study-v{version}.{uuid4()}.sqlite3")
+        try:
+            path.touch(mode=0o600, exist_ok=False)
+            with (
+                closing(sqlite3.connect(self.path)) as source,
+                closing(sqlite3.connect(path)) as target,
+            ):
+                source.backup(target)
+                if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                    raise RuntimeError(
+                        "The pre-migration backup failed verification; upgrade stopped"
+                    )
         except BaseException:
             path.unlink(missing_ok=True)
             raise
