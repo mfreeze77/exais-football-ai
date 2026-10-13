@@ -1,0 +1,58 @@
+name: Film library qualification
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install FFmpeg and Python tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install uv
+          uv sync --locked --extra dev --python python
+      - name: Check source, tickets, and real media workflows
+        run: |
+          uv run ruff check .
+          uv run ruff format --check src tests
+          uv run python docs/tickets/validate.py
+          uv run pytest -q
+      - name: Build and inspect wheel
+        run: |
+          uv run python -m build
+          python scripts/check_wheel.py
+      - name: Install wheel in an isolated environment
+        run: |
+          python -m venv /tmp/exais-wheel-check
+          /tmp/exais-wheel-check/bin/python -m pip install dist/*.whl
+          cd /tmp
+          /tmp/exais-wheel-check/bin/exais-football doctor
+          /tmp/exais-wheel-check/bin/python "$GITHUB_WORKSPACE/scripts/check_installed.py"
+      - uses: actions/setup-node@v4
+        if: matrix.python == '3.12'
+        with:
+          node-version: '22'
+      - name: Install optional browser test tooling
+        if: matrix.python == '3.12'
+        run: |
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps firefox
+      - name: Exercise the complete browser film workflow
+        if: matrix.python == '3.12'
+        env:
+          UI_BROWSER: firefox
+        run: node scripts/ui_smoke.mjs
