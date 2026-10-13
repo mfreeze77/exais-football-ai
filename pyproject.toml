@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "exais-football-ai"
+version = "0.1.0"
+description = "A local football film library with durable review and optional analysis integrations"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = ["fastapi>=0.143,<0.144", "uvicorn>=0.54,<0.55", "python-multipart>=0.0.32,<0.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=9.1,<10", "httpx>=0.28,<0.29", "ruff>=0.17,<0.18", "build>=1.3,<2"]
+
+[project.scripts]
+exais-football = "exais_football.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/exais_football"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/exais_football/app.py" = ["B008"]

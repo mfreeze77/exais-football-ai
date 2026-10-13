@@ -1,0 +1,2197 @@
+{
+  "$schema": "./catalog.schema.json",
+  "schema_version": "1.0",
+  "repository": "mfreeze77/exais-football-ai",
+  "updated_at": "2026-10-13",
+  "milestones": [
+    {
+      "id": "M1",
+      "title": "Working local film library and safe external adapter foundations",
+      "status": "implemented",
+      "exit_criteria": [
+        "Import existing clips, preserve originals, trim/label/review/retrieve them, manage playlists, and export audio-preserving MP4s through the local UI.",
+        "Qualify local API, persistence, provenance, and real FFmpeg behavior; verify installed-package assets.",
+        "Provide Kinovea handoff/sidecar preservation and CV suggestion import as explicit optional adapters. Real Windows execution and model inference remain separate later gates."
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Faster film study and deeper Kinovea interoperability",
+      "status": "planned",
+      "exit_criteria": [
+        "Support consistent/batch labeling, alternative cuts, accurate frame navigation, comparisons, annotations, and saved review sessions.",
+        "Validate versioned KVA interpretation and conflict-aware reconciliation without losing original sidecars."
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "Qualified optional football computer vision",
+      "status": "planned",
+      "exit_criteria": [
+        "Establish a pinned external environment, reviewed calibration/pre-snap inputs, bounded jobs, and complete source-bound artifacts.",
+        "Render audio-preserving overlays, maintain correction/identity decisions, and evaluate representative owner-approved footage.",
+        "Calibration transfer and track-quality improvements remain explicit evidence-gated enhancements."
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "Desktop convenience, recovery, scale, and release confidence",
+      "status": "planned",
+      "exit_criteria": [
+        "Qualify declared macOS/Windows installation paths and supported Kinovea versions.",
+        "Demonstrate full backup/restore, portable exports, migration/write-failure recovery, and safe derived-cache cleanup.",
+        "Record scale/media limits, dependency provenance, and final capability-specific release evidence. Independent recovery work can start immediately after M1."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "FCV-README",
+      "title": "football-cv README and author-reported evaluation",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/README.md",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Documentation describes alignment-derived position groups; evaluation is author-reported on private labels. Detector wording drifts from code."
+    },
+    {
+      "id": "FCV-API",
+      "title": "football-cv high-level analysis API",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/footballcv/api.py",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Explicit persistent data_dir and play_id are needed; default analysis uses a temporary directory."
+    },
+    {
+      "id": "FCV-DETECT",
+      "title": "football-cv detector implementation",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/footballcv/detect.py",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Selects RF-DETR when available, otherwise torchvision Faster R-CNN; dependency guard still checks ultralytics. MPS/CPU selection. Heavy model construction may obtain weights."
+    },
+    {
+      "id": "FCV-OVERLAY",
+      "title": "football-cv overlay renderer",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/viewer/backend/overlay.py",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Frame-based MP4 rendering does not carry source audio into its output; wrapper must preserve media provenance and timing."
+    },
+    {
+      "id": "FCV-SERVER",
+      "title": "football-cv local viewer server",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/viewer/backend/serve.py",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Development viewer APIs for frames, calibration, analysis stages, and artifacts; not the application's production server."
+    },
+    {
+      "id": "FCV-LANDING",
+      "title": "football-cv viewer landing page",
+      "url": "https://github.com/andrewneuwirth/football-cv/blob/38f6f758d3e78af3b700f144214c2d4566459c5d/viewer/web/index.html",
+      "kind": "upstream_code",
+      "revision": "38f6f758d3e78af3b700f144214c2d4566459c5d",
+      "reviewed_at": "2026-10-13",
+      "notes": "Upload handler attaches a local object URL for playback and explicitly says analysis requires the backend."
+    },
+    {
+      "id": "KIN-DOWNLOAD",
+      "title": "Kinovea official downloads, platform requirements, and license",
+      "url": "https://kinovea.org/download/",
+      "kind": "official_documentation",
+      "revision": "2025.2.0 download page, reviewed 2026-10-13",
+      "reviewed_at": "2026-10-13",
+      "notes": "Windows x86-64; official page excludes Apple Silicon support. GPL v2. External application only."
+    },
+    {
+      "id": "KIN-MANUAL",
+      "title": "Kinovea official reference manual",
+      "url": "https://kinovea.org/help/en/index.html",
+      "kind": "official_documentation",
+      "revision": "0.9.5 manual",
+      "reviewed_at": "2026-10-13",
+      "notes": "Describes playback, comparison, annotations, measurements, and exports. Older manual must be read with release notes."
+    },
+    {
+      "id": "KIN-2023",
+      "title": "Kinovea 2023.1 release notes",
+      "url": "https://kinovea.org/download/releases/2023.1.html",
+      "kind": "official_documentation",
+      "revision": "2023.1",
+      "reviewed_at": "2026-10-13",
+      "notes": "Working-zone boundaries and import options can persist in annotations; time-origin alignment affects importing into different videos."
+    },
+    {
+      "id": "KIN-2025",
+      "title": "Kinovea 2025.1 release notes",
+      "url": "https://kinovea.org/download/releases/2025.1.html",
+      "kind": "official_documentation",
+      "revision": "2025.1",
+      "reviewed_at": "2026-10-13",
+      "notes": "Documents -video2 comparison launch and multi-window behavior."
+    },
+    {
+      "id": "KIN-2025-2",
+      "title": "Kinovea 2025.2 release notes",
+      "url": "https://kinovea.org/download/releases/2025.2.html",
+      "kind": "official_documentation",
+      "revision": "2025.2",
+      "reviewed_at": "2026-10-13",
+      "notes": "Includes timing and KVA loading fixes; release-specific integration fixtures are necessary."
+    }
+  ],
+  "tickets": [
+    {
+      "id": "EFA-001",
+      "title": "Establish the local application and capability boundary",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "foundation",
+      "outcome": "Start a private film room on one computer with actionable setup feedback and no automatic external processing.",
+      "scope": [
+        "Create the Python package, CLI, same-origin static application, and FastAPI startup/shutdown lifecycle.",
+        "Load app-owned workspace configuration and expose health/capability information for FFmpeg, ffprobe, Kinovea, and optional football-cv."
+      ],
+      "non_goals": [
+        "Public hosting, account management, provider uploads, automatic weight downloads, or native desktop installers."
+      ],
+      "acceptance_checks": [
+        "A fresh configured data directory starts through the documented CLI and responds on loopback.",
+        "GET /api/health reports the application version and an explicit available/reason state for each optional capability.",
+        "Starting the app performs no film upload, model execution, or model download.",
+        "Startup and shutdown create/close the database and export worker without leaving duplicate workers."
+      ],
+      "dependencies": [],
+      "risks": [
+        "An optional missing executable must disable its dependent feature without hiding the rest of the library.",
+        "Do not confuse an importable Python dependency with a qualified native application or trained model."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "app.py, cli.py and config.py: loopback startup, health, body/origin limits, lifecycle and instance lock; installed-wheel startup checked.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 1,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/1"
+      },
+      "body_path": "docs/tickets/EFA-001.md"
+    },
+    {
+      "id": "EFA-002",
+      "title": "Persist film records and immutable source provenance",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "storage",
+      "outcome": "Keep every review attached to the correct original film across application restarts.",
+      "scope": [
+        "Create SQLite records for clips, games, players, tags, revisions, notes, playlists, jobs, and imported suggestions.",
+        "Assign opaque IDs and retain source SHA-256, duration, media properties, original filename, and application-owned storage location."
+      ],
+      "non_goals": [
+        "Roster biometric identity resolution, cloud databases, or deducing a person's identity from a file hash."
+      ],
+      "acceptance_checks": [
+        "Restarting the application preserves imported records and relationships.",
+        "Foreign-key enforcement rejects nonexistent game, player, or clip references.",
+        "SHA-256 and media properties cannot be changed through metadata edit routes.",
+        "Source-relative times remain stable when a view range or title changes.",
+        "Database files and media directories are ignored by git."
+      ],
+      "dependencies": [
+        "EFA-001"
+      ],
+      "risks": [
+        "A source hash identifies bytes; separate clips of the same player must never be merged by identity assumptions.",
+        "Multiple-source and multi-angle models may require later additive migrations."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "db.py and service.py: SQLite foreign keys, immutable media fields, source hashes and restart persistence; tests/test_api.py passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 2,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/2"
+      },
+      "body_path": "docs/tickets/EFA-002.md"
+    },
+    {
+      "id": "EFA-003",
+      "title": "Import existing clips safely with duplicate detection",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "ingest",
+      "outcome": "Bring the owner's existing game clips into the library without damaging originals or multiplying identical imports.",
+      "scope": [
+        "Accept bounded multipart video uploads and copy successful imports into managed storage.",
+        "Probe media, compute source hashes, create thumbnails where available, and report duplicates explicitly."
+      ],
+      "non_goals": [
+        "Whole-game automatic play detection, remote video download, and importing arbitrary server filesystem paths."
+      ],
+      "acceptance_checks": [
+        "A generated audio/video fixture imports with the correct duration, dimensions, audio flag, and source hash.",
+        "A second import of identical bytes returns the original clip ID and duplicate=true.",
+        "Unsupported, corrupt, oversized, and empty uploads return useful errors and leave no committed clip.",
+        "Client filenames containing traversal or shell characters cannot escape the managed workspace.",
+        "A failed probe or copy does not leave a valid-looking clip with missing source bytes."
+      ],
+      "dependencies": [
+        "EFA-002"
+      ],
+      "risks": [
+        "Content-type and file extension alone are not proof that a video can be decoded.",
+        "Source copying requires temporary space; failure cleanup must preserve existing clips."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "service.py: real media import, duplicate detection and unsafe-input checks; tests/test_import_failures.py reproduces concurrent rollback without deleting a reused source.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 3,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/3"
+      },
+      "body_path": "docs/tickets/EFA-003.md"
+    },
+    {
+      "id": "EFA-004",
+      "title": "Save metadata with optimistic concurrency and revision restore",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "catalog",
+      "outcome": "Edit labels confidently and recover earlier review choices without silently losing another tab's changes.",
+      "scope": [
+        "Update title, description, phase, review status, game, tags, player references, and selected range with a required version.",
+        "Persist revision snapshots and restore editable metadata as a new revision."
+      ],
+      "non_goals": [
+        "Full undo of source files, automatic conflict merging, or removal of prior history."
+      ],
+      "acceptance_checks": [
+        "A current-version PATCH increments version and records the previous/new review state consistently.",
+        "A stale-version PATCH returns 409 and leaves the stored clip unchanged.",
+        "Replacing tag/player lists validates and normalizes their inputs without partially applying invalid relationships.",
+        "Restoring a prior revision requires current_version and creates a new version rather than rewinding history.",
+        "Immutable source fields and invalid enum values are rejected."
+      ],
+      "dependencies": [
+        "EFA-002"
+      ],
+      "risks": [
+        "Whole-list replacement is deliberate; UI must preserve unsaved edits until success or an explicit conflict resolution.",
+        "A restored timestamp must still satisfy the immutable source duration."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "service.py and models.py: atomic versioned edits, two competing writers, normalization and new-revision restore; tests/test_api.py passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 4,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/4"
+      },
+      "body_path": "docs/tickets/EFA-004.md"
+    },
+    {
+      "id": "EFA-005",
+      "title": "Review source video with a non-destructive selected interval",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "playback",
+      "outcome": "Tighten each clip for future watching while keeping the complete source available.",
+      "scope": [
+        "Support byte-range/HEAD source playback, selected in/out times, looping, and browser playback-speed controls.",
+        "Save 0 <= start_seconds < end_seconds <= source_duration as metadata."
+      ],
+      "non_goals": [
+        "Guaranteed frame-accurate browser seeking, drawing tools, or deleting the original media outside the selected interval."
+      ],
+      "acceptance_checks": [
+        "Valid byte-range requests return the expected bytes and invalid ranges return a controlled response.",
+        "A trim update never changes the source file hash or source_duration.",
+        "Invalid, reversed, non-finite, or out-of-bounds selections are rejected.",
+        "The UI can mark in/out, play or loop the saved interval, and reopen it after a restart.",
+        "All displayed/editable timestamps refer to the original source rather than a previously exported trim."
+      ],
+      "dependencies": [
+        "EFA-003",
+        "EFA-004"
+      ],
+      "risks": [
+        "Browser decoders may seek to nearby frames; exact frame navigation is a later qualification task.",
+        "Very tight trims can remove pre-snap alignment needed by later CV analysis."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "API range/HEAD and original-hash tests passed; real Firefox tested saved selection, looping, slow playback and nominal frame stepping.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 5,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/5"
+      },
+      "body_path": "docs/tickets/EFA-005.md"
+    },
+    {
+      "id": "EFA-006",
+      "title": "Add durable timed coaching notes",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "review",
+      "outcome": "Record what to watch and reopen the relevant moment without relying on filenames.",
+      "scope": [
+        "Create/list/delete clip notes with optional source-relative timestamps.",
+        "Display note markers or links that seek the selected source to the stored moment."
+      ],
+      "non_goals": [
+        "Audio dictation, collaborative comments, or editable Kinovea drawing objects."
+      ],
+      "acceptance_checks": [
+        "An untimed note and a timed note survive restart and return against the correct clip.",
+        "A timed note accepts zero and source-duration boundaries according to the API contract, and rejects out-of-bounds/non-finite values.",
+        "Deleting a note from one clip cannot delete a note belonging to another clip.",
+        "A note containing HTML is displayed as text and cannot execute code.",
+        "Clicking a timed note seeks to that source-relative moment without rewriting trim bounds."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-005"
+      ],
+      "risks": [
+        "Notes outside the selected interval still belong to the original source; the UI must make that context clear.",
+        "Deleting a note must never delete film."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Timed/untimed note storage, boundary/non-finite/ownership checks passed; real Firefox tested note creation, seeking and durable retrieval. User content uses DOM text APIs.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 6,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/6"
+      },
+      "body_path": "docs/tickets/EFA-006.md"
+    },
+    {
+      "id": "EFA-007",
+      "title": "Find film by search and combined football filters",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "catalog",
+      "outcome": "Retrieve useful clips by what they show instead of browsing an expanding folder tree.",
+      "scope": [
+        "Implement query, game, player, tag, phase, review-status, favorite, and archive filters.",
+        "Return totals and bounded pagination; show tag counts and library summary statistics."
+      ],
+      "non_goals": [
+        "Semantic search, natural-language query agents, or automatic play classification."
+      ],
+      "acceptance_checks": [
+        "Combining filters returns only records satisfying the documented intersection.",
+        "Default clip searches exclude archived clips while the explicit archived view can retrieve them.",
+        "Pagination returns stable pages with a total matching the same filters.",
+        "Empty searches and no-match searches display clear UI states.",
+        "Invalid identifiers/filter values return documented errors rather than leaking SQL details."
+      ],
+      "dependencies": [
+        "EFA-003",
+        "EFA-004"
+      ],
+      "risks": [
+        "Search meanings and ordering must be stable before saved filters are added.",
+        "Filter state must not imply AI labels have become accepted human tags."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Combined filter/search and archive API checks passed; real Firefox tested favorites, note search and library retrieval. Stable pagination uses updated_at/id ordering.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 7,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/7"
+      },
+      "body_path": "docs/tickets/EFA-007.md"
+    },
+    {
+      "id": "EFA-008",
+      "title": "Manage games and a simple manually maintained roster",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "catalog",
+      "outcome": "Associate clips with the game and people the owner knows.",
+      "scope": [
+        "Create and list games with opponent/date/season/notes.",
+        "Create and list player records with name, jersey, and position; associate clip metadata with these IDs."
+      ],
+      "non_goals": [
+        "Automatic roster import, jersey OCR, face recognition, or treating per-play track IDs as roster IDs."
+      ],
+      "acceptance_checks": [
+        "Game creation requires title and opponent and preserves optional fields.",
+        "Player creation preserves names, jerseys, and positions without treating jerseys as globally unique identities.",
+        "A clip can reference multiple existing players and an optional existing game.",
+        "Invalid relationship IDs cannot be saved.",
+        "The UI creates a game/player and then makes it available for clip assignment without restarting."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-004"
+      ],
+      "risks": [
+        "Jersey numbers can repeat between teams and seasons; they are attributes, not primary keys.",
+        "The owner supplies roster identity in the first milestone."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Game/player creation and validated assignments passed in the API suite and real Firefox batch/review workflow.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 8,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/8"
+      },
+      "body_path": "docs/tickets/EFA-008.md"
+    },
+    {
+      "id": "EFA-009",
+      "title": "Favorite and archive clips without losing film",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "catalog",
+      "outcome": "Keep the active library focused while retaining earlier clips for later retrieval.",
+      "scope": [
+        "Save favorite and archived flags through versioned metadata edits.",
+        "Expose quick favorite filters and an explicit archive view."
+      ],
+      "non_goals": [
+        "Source deletion, disk cleanup, or inferring a coach's approval from a favorite."
+      ],
+      "acceptance_checks": [
+        "Favoriting a clip updates the favorites filter and summary count.",
+        "Archiving removes the clip from the default active library but leaves its source and history intact.",
+        "Unarchiving restores the same clip ID and relationships.",
+        "Archived clips remain addressable and their playlist presentation is documented.",
+        "A stale favorite/archive update triggers the normal concurrency conflict rather than overwriting newer edits."
+      ],
+      "dependencies": [
+        "EFA-004",
+        "EFA-007"
+      ],
+      "risks": [
+        "Archive is a visibility choice, not a backup or deletion operation.",
+        "Derived statistics must use the documented active-clip population."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Favorite/archive versioned writes and source retention passed in API tests; real Firefox tested favorites, archive and restore.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 9,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/9"
+      },
+      "body_path": "docs/tickets/EFA-009.md"
+    },
+    {
+      "id": "EFA-010",
+      "title": "Create ordered playlists and watch a focused set of clips",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "playlists",
+      "outcome": "Return to a useful sequence of plays without copying video files into more folders.",
+      "scope": [
+        "Create playlists with title/description and replace ordered clip membership.",
+        "Display each playlist and play its clips in the saved order."
+      ],
+      "non_goals": [
+        "Smart playlists, exported compilation movies, progress tracking, or per-viewer accounts."
+      ],
+      "acceptance_checks": [
+        "Saving an ordered clip list and reopening it preserves order.",
+        "Unknown clip IDs and duplicate membership are rejected atomically.",
+        "Reordering does not duplicate or modify original media.",
+        "A playlist containing an archived clip has an explicit visible state rather than silently changing order.",
+        "The UI can create a playlist and watch more than one clip from it."
+      ],
+      "dependencies": [
+        "EFA-005",
+        "EFA-008",
+        "EFA-009"
+      ],
+      "risks": [
+        "Playlist membership references a clip whose trim may later change; version-frozen sessions are a later extension.",
+        "Empty playlists need a useful state."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Playlist validation/atomic replacement passed; real Firefox tested selection across search, saved order, sequential review and archived presentation.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 10,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/10"
+      },
+      "body_path": "docs/tickets/EFA-010.md"
+    },
+    {
+      "id": "EFA-011",
+      "title": "Run durable audio-preserving trim exports",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "media",
+      "outcome": "Produce a tightened MP4 that remains tied to the exact review settings used to create it.",
+      "scope": [
+        "Queue exports from a frozen clip revision and retain job state/errors in SQLite.",
+        "Use bounded FFmpeg processing, optional source audio mapping, verified H.264 output, and atomic publication."
+      ],
+      "non_goals": [
+        "Real-time transcoding, AI overlay rendering, task cancellation, or a distributed job queue."
+      ],
+      "acceptance_checks": [
+        "A real generated fixture exports the selected duration within a declared codec tolerance and retains its audio stream.",
+        "A metadata edit made after enqueue does not change the queued export's interval or clip_version.",
+        "Source bytes remain unchanged and the completed job provides a valid download.",
+        "A nonzero process exit, missing executable, timeout, or write failure becomes a meaningful failed job.",
+        "Restart marks interrupted queued/running work failed according to the contract instead of announcing completion.",
+        "A partial output is never exposed as a completed artifact."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-005"
+      ],
+      "risks": [
+        "Accurate trims re-encode; elapsed processing depends on source size and available encoders.",
+        "Do not silently drop audio as the inspected upstream overlay does."
+      ],
+      "source_refs": [
+        "FCV-OVERLAY"
+      ],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Real FFmpeg duration/audio/source-hash and frozen-version export checks passed. The job rejects a source changed after its precheck. Firefox downloaded and probed the exported MP4.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 11,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/11"
+      },
+      "body_path": "docs/tickets/EFA-011.md"
+    },
+    {
+      "id": "EFA-012",
+      "title": "Provide safe external Kinovea launch and KVA preservation",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "integrations",
+      "outcome": "Keep Kinovea available for detailed technique review while retaining its sidecar with the library clip.",
+      "scope": [
+        "Report configured Kinovea capability and launch only a locally configured executable on supported Windows systems.",
+        "Validate size-bounded KVA XML without DTD/entities, preserve original bytes, and download saved sidecars."
+      ],
+      "non_goals": [
+        "Native Windows acceptance in this milestone, automatic working-zone/tag synchronization, or copying GPL code."
+      ],
+      "acceptance_checks": [
+        "Unsupported platforms or missing configuration return an explicit unavailable reason.",
+        "A mocked Windows launch uses a command array and a managed clip path; request bodies cannot select an executable.",
+        "Malformed XML, DTD/entities, unsupported roots/schema, and oversized uploads are rejected.",
+        "A valid sidecar is preserved byte-for-byte and retrieved only through its clip association.",
+        "KVA import does not silently overwrite the library's tags, notes, trim, or source hash.",
+        "Documentation distinguishes adapter tests from the later real-Windows qualification gate."
+      ],
+      "dependencies": [
+        "EFA-001",
+        "EFA-003"
+      ],
+      "risks": [
+        "KVA schemas vary by release and may reference a different video/time origin.",
+        "Kinovea remains an external GPL v2 application; advanced mapping requires explicit compatibility work."
+      ],
+      "source_refs": [
+        "KIN-DOWNLOAD",
+        "KIN-2023",
+        "KIN-2025"
+      ],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Safe XML, byte preservation and mocked Windows argv checks passed; tests/test_native_handoff.py verifies real copy/hash/no-overwrite races and injected I/O failures. Actual Windows Kinovea remains EFA-041 and unrun.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 12,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/12"
+      },
+      "body_path": "docs/tickets/EFA-012.md"
+    },
+    {
+      "id": "EFA-013",
+      "title": "Import and review football-cv position suggestions safely",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "integrations",
+      "outcome": "Attach external analysis to the right clip while keeping model suggestions distinct from coaching labels.",
+      "scope": [
+        "Accept a revision-pinned position bundle with source SHA-256 and per-play tracking IDs.",
+        "Store immutable suggestion payloads and explicit unreviewed/accepted/rejected human review status."
+      ],
+      "non_goals": [
+        "Running a detector, calibration UI, named-player recognition, or deriving play/technique tags from positions."
+      ],
+      "acceptance_checks": [
+        "A valid position bundle is stored as unreviewed and lists its upstream revision.",
+        "A mismatched source SHA-256 is rejected without retaining a misleading analysis record.",
+        "Unsupported position tokens, malformed IDs, unknown schema fields, and non-finite data are rejected.",
+        "Changing review status preserves the imported payload and cannot affect another clip's record.",
+        "Accepting a suggestion does not assign roster players or populate human tags.",
+        "The UI identifies this as external analysis import and does not imply model execution is installed."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-003",
+        "EFA-004"
+      ],
+      "risks": [
+        "Upstream results are uncertain and track IDs are scoped to a play/run.",
+        "The author's private-label benchmark is not a quality result for the owner's footage."
+      ],
+      "source_refs": [
+        "FCV-API",
+        "FCV-README",
+        "FCV-DETECT"
+      ],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Source-bound bundle validation, immutable imported payload and separate review checks passed in tests/test_integrations.py and tests/test_api.py. Actual model execution/accuracy remains M3 and unrun.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 13,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/13"
+      },
+      "body_path": "docs/tickets/EFA-013.md"
+    },
+    {
+      "id": "EFA-014",
+      "title": "Deliver the complete same-origin local film-room interface",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "ui",
+      "outcome": "Complete the import, tighten, label, note, playlist, and export journey through one usable local interface.",
+      "scope": [
+        "Build responsive clip browsing/review, metadata forms, management panels, upload progress, and pending-export polling.",
+        "Handle loading/empty/error states, stale selection responses, unsaved edits, and keyboard focus correctly."
+      ],
+      "non_goals": [
+        "Native application packaging, remote hosted assets, automatic model analysis, or demo film presented as user data."
+      ],
+      "acceptance_checks": [
+        "A new library starts empty and guides the owner to import clips.",
+        "The owner can import, select, trim, label, add a note, favorite, add to a playlist, and download an export.",
+        "Switching clip selection cannot show late data from a previous clip as the current record.",
+        "Typing in text inputs does not trigger playback shortcuts.",
+        "Server validation/conflict messages remain visible and unsaved edits are preserved or explicitly resolved.",
+        "User-controlled strings use safe DOM text rendering; scripts and styles load without a remote CDN."
+      ],
+      "dependencies": [
+        "EFA-003",
+        "EFA-004",
+        "EFA-005",
+        "EFA-006",
+        "EFA-007",
+        "EFA-008",
+        "EFA-009",
+        "EFA-010",
+        "EFA-011",
+        "EFA-012",
+        "EFA-013"
+      ],
+      "risks": [
+        "UI polish cannot substitute for a real end-to-end import/export test.",
+        "Different browser codecs and small displays require later expanded qualification."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "All eight real Firefox workflow groups passed in scripts/ui_smoke.mjs, including text safety, drafts/409, import/review/export, playlists and responsive layout; JS/static checks passed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 14,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/14"
+      },
+      "body_path": "docs/tickets/EFA-014.md"
+    },
+    {
+      "id": "EFA-015",
+      "title": "Qualify source safety and the complete local media workflow",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "quality",
+      "outcome": "Establish evidence that core editing and export preserve the owner's film and reject unsafe requests.",
+      "scope": [
+        "Run meaningful API/storage/security tests and one generated real-FFmpeg import-to-export workflow.",
+        "Check duplicate imports, concurrency, relationships, timestamps, range playback, safe paths, XML, and wrong-source analysis."
+      ],
+      "non_goals": [
+        "Real model accuracy claims, live Windows Kinovea checks, or unsupported CI results reported as executed."
+      ],
+      "acceptance_checks": [
+        "Generated test video with an audio tone proves import, persistence, selected export duration, audio retention, and unchanged source hash.",
+        "Negative tests exercise traversal/unsafe filenames, invalid relationships, stale edits, unsafe KVA, and wrong-source AI results.",
+        "Failure tests assert the actual returned error fields and durable job state.",
+        "The recorded qualification report distinguishes executed checks, failures, and environment-blocked gates.",
+        "No real game footage, model weights, credentials, or runtime database enters the commit."
+      ],
+      "dependencies": [
+        "EFA-003",
+        "EFA-004",
+        "EFA-005",
+        "EFA-006",
+        "EFA-011",
+        "EFA-012",
+        "EFA-013",
+        "EFA-014"
+      ],
+      "risks": [
+        "Passing unit tests alone does not establish decoder/encoder behavior.",
+        "Browser smoke is required when a local headless browser is available; otherwise record it unrun."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "All 94 Python tests passed locally and in the Python 3.11/3.12 CI matrix; real Firefox workflow passed. Scope, reproduced failures and remaining limits are in docs/QUALIFICATION.md.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 15,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/15"
+      },
+      "body_path": "docs/tickets/EFA-015.md"
+    },
+    {
+      "id": "EFA-016",
+      "title": "Package the first release and publish an honest handoff",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "implemented",
+      "area": "release",
+      "outcome": "Make the first working milestone installable and make its capabilities and remaining gates unambiguous.",
+      "scope": [
+        "Build/install a wheel in an isolated environment, include static assets, and document startup/data location/dependencies.",
+        "Publish the ticket catalog, API contract, setup/user guidance, qualification evidence, and reviewable implementation PR."
+      ],
+      "non_goals": [
+        "Auto-merge, native notarized installers, cloud deployment, or claiming every planned ticket is shipped."
+      ],
+      "acceptance_checks": [
+        "A built wheel installs in isolation and serves its packaged UI assets.",
+        "The documented CLI and setup prerequisites match the actual package.",
+        "Formatter/linter and applicable test results are recorded with the tested revision/environment.",
+        "The complete ticket catalog validates without cycles, missing bodies, or nonexistent dependencies.",
+        "Implemented ticket statuses reference real evidence; GitHub issues remain open for PR review until merge.",
+        "README and handoff identify real CV inference, live Windows behavior, backup/restore, and advanced analysis as later work where unqualified."
+      ],
+      "dependencies": [
+        "EFA-001",
+        "EFA-002",
+        "EFA-014",
+        "EFA-015"
+      ],
+      "risks": [
+        "A source-tree run can hide missing wheel assets; installed-package verification is a separate gate.",
+        "User authorization covers pushing progress and opening a PR, not automatic merge."
+      ],
+      "source_refs": [],
+      "evidence": [
+        "Qualified candidate commit 153e5073e918dc06d28b4615f2d7749ed9e5b62b, 2026-10-13; Linux, Python 3.12.14, FFmpeg/ffprobe 6.1.1 locally; Python 3.11/3.12 and Firefox in CI.",
+        "Wheel/sdist build, isolated installation, startup and every packaged UI asset passed locally and in CI. All 48 tickets/255 acceptance checks/mappings/DAG validate. PR #49 is the review handoff; no merge performed.",
+        "Passing CI: https://github.com/mfreeze77/exais-football-ai/actions/runs/38332745633",
+        "Full qualification evidence: docs/QUALIFICATION.md. Candidate awaits accepted merge in https://github.com/mfreeze77/exais-football-ai/pull/49; separately scoped native/model/platform gates remain unrun."
+      ],
+      "github_issue": {
+        "number": 16,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/16"
+      },
+      "body_path": "docs/tickets/EFA-016.md"
+    },
+    {
+      "id": "EFA-017",
+      "title": "Introduce reusable football tag groups and terminology",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "catalog",
+      "outcome": "Apply consistent labels across games while allowing the owner to use their own football vocabulary.",
+      "scope": [
+        "Add editable groups for phase, skill, formation, play concept, result, and review purpose with optional presets.",
+        "Support tag aliases/renames with explicit migration of existing associations and counts."
+      ],
+      "non_goals": [
+        "Automatic tactical interpretation, a mandatory universal playbook, or changing accepted human labels without review."
+      ],
+      "acceptance_checks": [
+        "A preset can apply a small useful tag set without requiring every metadata field.",
+        "An alias resolves to one canonical tag and avoids duplicate search results.",
+        "A rename previews affected clips and updates associations atomically.",
+        "Deleting a preset does not erase tags already applied to film.",
+        "Imported unfamiliar tags remain recoverable and can be mapped by the owner."
+      ],
+      "dependencies": [
+        "EFA-004",
+        "EFA-007",
+        "EFA-016"
+      ],
+      "risks": [
+        "Team terminology varies; rigid taxonomies can make a personal library slower to use.",
+        "Keep free-text tags compatible with the initial schema."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 17,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/17"
+      },
+      "body_path": "docs/tickets/EFA-017.md"
+    },
+    {
+      "id": "EFA-018",
+      "title": "Apply batch metadata edits with preview and recovery",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "catalog",
+      "outcome": "Label many clips from one game quickly without accidentally replacing unrelated review work.",
+      "scope": [
+        "Add multi-select and batch game/player/tag/review actions with a concrete change preview.",
+        "Use per-clip versions, an auditable batch ID, and a recoverable before-state."
+      ],
+      "non_goals": [
+        "Bulk source deletion or silently resolving concurrent edits."
+      ],
+      "acceptance_checks": [
+        "Preview identifies affected clips and distinguishes add/remove/replace tag semantics.",
+        "A stale clip revision prevents that clip from being overwritten and produces an explicit conflict result.",
+        "The chosen all-or-nothing or partial-success policy is documented and tested.",
+        "Undo restores only fields changed by the batch and checks for subsequent edits.",
+        "A batch cannot assign nonexistent games/players or archive a clip outside the selected set."
+      ],
+      "dependencies": [
+        "EFA-004",
+        "EFA-009",
+        "EFA-014",
+        "EFA-017"
+      ],
+      "risks": [
+        "One unnoticed replacement can destroy many useful labels; batch intent must be visible.",
+        "Recovery must avoid overwriting changes made after the batch."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 18,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/18"
+      },
+      "body_path": "docs/tickets/EFA-018.md"
+    },
+    {
+      "id": "EFA-019",
+      "title": "Support alternative cuts and multiple views of one source",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "media",
+      "outcome": "Keep a wider analysis view and a tighter watching view without duplicating the original video.",
+      "scope": [
+        "Separate immutable source assets from named selected intervals where the initial one-clip model requires it.",
+        "Allow several derived clip views with their own notes/tags while recording shared source ownership."
+      ],
+      "non_goals": [
+        "Automatic full-game segmentation or joining unrelated source files."
+      ],
+      "acceptance_checks": [
+        "Two named selections reference one physical source hash and independent start/end values.",
+        "Editing one view does not modify another view's trim or human labels.",
+        "Notes and exports identify both their source asset and selected view.",
+        "Existing first-release clips migrate without changed IDs or lost history.",
+        "The owner can select a wider context view for calibration while retaining the tight review view."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-004",
+        "EFA-005",
+        "EFA-011",
+        "EFA-016"
+      ],
+      "risks": [
+        "Separating source assets and views is a schema evolution with backup requirements.",
+        "A hash match does not prove two records have identical intended editorial meaning."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 19,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/19"
+      },
+      "body_path": "docs/tickets/EFA-019.md"
+    },
+    {
+      "id": "EFA-020",
+      "title": "Add accurate frame navigation and timeline previews",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "playback",
+      "outcome": "Move precisely around the snap, first step, and contact instead of repeatedly guessing timestamps.",
+      "scope": [
+        "Generate a bounded frame/timestamp index and thumbnail strip tied to source media.",
+        "Support next/previous decoded-frame navigation and snapping in/out points to known timestamps."
+      ],
+      "non_goals": [
+        "Claiming constant frame rate for every file or using browser currentTime alone as proof of frame accuracy."
+      ],
+      "acceptance_checks": [
+        "A synthetic frame-numbered fixture confirms forward/back navigation targets the intended frame.",
+        "Variable-frame-rate input uses recorded presentation timestamps rather than frame/fps arithmetic.",
+        "Timeline thumbnails map to source-relative times and regenerate when their source hash differs.",
+        "Preview caches have documented disk bounds and never replace originals.",
+        "The UI explains any fallback to approximate browser seeking."
+      ],
+      "dependencies": [
+        "EFA-005",
+        "EFA-019"
+      ],
+      "risks": [
+        "Variable rates, rotation, and nonzero stream origins can misalign overlays.",
+        "Indexing cost should not block ordinary playback."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 20,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/20"
+      },
+      "body_path": "docs/tickets/EFA-020.md"
+    },
+    {
+      "id": "EFA-021",
+      "title": "Qualify keyboard, accessibility, and small-screen review",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "ui",
+      "outcome": "Use the film room comfortably for repeated review sessions with a keyboard or a smaller display.",
+      "scope": [
+        "Provide documented shortcuts, semantic form labels, focus management, and accessible status messages.",
+        "Refine responsive review/catalog layouts and large target sizes without obscuring video controls."
+      ],
+      "non_goals": [
+        "A mobile-native app, remote synchronization, or changing clip metadata through ambiguous single-key shortcuts."
+      ],
+      "acceptance_checks": [
+        "Keyboard-only navigation can import/select a clip, edit metadata, add a note, and export.",
+        "Shortcuts are inactive inside text-editing controls and dialogs return focus to their opener.",
+        "Errors, saving states, and job completion are announced without stealing focus.",
+        "Review tools remain usable at defined desktop and small-browser widths.",
+        "Contrast, labels, and focus checks are recorded against actual rendered pages."
+      ],
+      "dependencies": [
+        "EFA-014",
+        "EFA-016"
+      ],
+      "risks": [
+        "Automated accessibility scans do not establish usability for a full review session.",
+        "Playback shortcuts can conflict with browser defaults and text entry."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 21,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/21"
+      },
+      "body_path": "docs/tickets/EFA-021.md"
+    },
+    {
+      "id": "EFA-022",
+      "title": "Compare two clips around explicit synchronization anchors",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "playback",
+      "outcome": "Compare repetitions or two camera angles at the moment that matters, such as the snap.",
+      "scope": [
+        "Create comparison records referencing two clips and source-relative anchor timestamps.",
+        "Provide synchronized play/pause, adjustable offset, independent zoom, and a clear behavior at interval boundaries."
+      ],
+      "non_goals": [
+        "Automatic temporal alignment, geometric camera fusion, or claiming calibrated measurements from arbitrary zoom."
+      ],
+      "acceptance_checks": [
+        "Two generated videos with known offsets align within a declared playback tolerance.",
+        "Changing a comparison offset does not rewrite either source or clip trim.",
+        "Each panel identifies its game/clip and whether it shows original or derived media.",
+        "Pause/seek/speed controls behave consistently when one clip reaches its boundary.",
+        "Saved comparisons reopen with their selected clips, anchors, and layout."
+      ],
+      "dependencies": [
+        "EFA-005",
+        "EFA-019",
+        "EFA-020"
+      ],
+      "risks": [
+        "Different frame rates and browser decode load can introduce drift; state the measured tolerance.",
+        "Two views of one play need explicit linkage rather than filename inference."
+      ],
+      "source_refs": [
+        "KIN-MANUAL"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 22,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/22"
+      },
+      "body_path": "docs/tickets/EFA-022.md"
+    },
+    {
+      "id": "EFA-023",
+      "title": "Create source-anchored drawings and keyframe snapshots",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "review",
+      "outcome": "Mark the foot placement, pursuit line, or player position that a future viewing should focus on.",
+      "scope": [
+        "Add original-code arrows, circles, text, and simple freehand annotation with visibility intervals.",
+        "Store normalized geometry, source dimensions/time, and versioned snapshot exports."
+      ],
+      "non_goals": [
+        "Copying Kinovea GPL drawing implementations, physical measurement claims, or automatic biomechanical coaching."
+      ],
+      "acceptance_checks": [
+        "A drawing remains aligned when the player viewport is resized without changing the video coordinate system.",
+        "Visibility intervals and keyframes use original-source timestamps.",
+        "Undo/redo affects annotation revisions and never deletes source film.",
+        "Exported stills visibly include chosen annotations and retain source/time attribution in their manifest.",
+        "HTML/script-like annotation text is safely rendered and exported."
+      ],
+      "dependencies": [
+        "EFA-004",
+        "EFA-020"
+      ],
+      "risks": [
+        "Letterboxing, rotation, and cropped derivatives require explicit coordinate transforms.",
+        "Visible labels and hidden metadata notes are different outputs."
+      ],
+      "source_refs": [
+        "KIN-MANUAL"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 23,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/23"
+      },
+      "body_path": "docs/tickets/EFA-023.md"
+    },
+    {
+      "id": "EFA-024",
+      "title": "Save searches and maintain dynamic clip collections",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "playlists",
+      "outcome": "Reopen a category such as tackling clips needing another look without rebuilding filters each time.",
+      "scope": [
+        "Persist validated filter specifications as named saved searches.",
+        "Expose dynamic result counts/order and optional conversion to a fixed playlist snapshot."
+      ],
+      "non_goals": [
+        "LLM-generated query execution, arbitrary SQL, or silently changing fixed playlist membership."
+      ],
+      "acceptance_checks": [
+        "A saved search reuses the documented filter semantics after restart.",
+        "Newly labeled clips enter dynamic results while fixed playlists stay unchanged.",
+        "Unsupported filter versions are reported rather than ignored.",
+        "Converting results to a playlist preserves the reviewed order and selected clip IDs.",
+        "Renaming a tag through the taxonomy workflow has a documented effect on saved searches."
+      ],
+      "dependencies": [
+        "EFA-007",
+        "EFA-010",
+        "EFA-017"
+      ],
+      "risks": [
+        "Dynamic collections change over time; the UI must identify when a set is live versus frozen.",
+        "Queries must remain bounded at larger library sizes."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 24,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/24"
+      },
+      "body_path": "docs/tickets/EFA-024.md"
+    },
+    {
+      "id": "EFA-025",
+      "title": "Add focused playlist review sessions and progress",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "playlists",
+      "outcome": "Pick up a film session where the owner stopped and revisit the most useful plays.",
+      "scope": [
+        "Persist a local session with playlist snapshot, clip position, replay count, and personal watch-again markers.",
+        "Provide next/previous, loop-current, review notes, and explicit finish/reset controls."
+      ],
+      "non_goals": [
+        "Multi-user attendance analytics, notifications to other people, or grading players automatically."
+      ],
+      "acceptance_checks": [
+        "A stopped session resumes at its stored clip and source-relative time after restart.",
+        "A subsequent playlist edit does not silently change a session's frozen order.",
+        "Replay counts and watch-again markers are local viewing metadata and do not change coaching approval.",
+        "The owner can reset progress without deleting clip notes or video.",
+        "Archived/missing references produce a recoverable state that preserves remaining order."
+      ],
+      "dependencies": [
+        "EFA-010",
+        "EFA-019",
+        "EFA-024"
+      ],
+      "risks": [
+        "Playback completion is not proof that the owner learned or approved a technique.",
+        "Frozen sessions require explicit choices when clips are edited."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 25,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/25"
+      },
+      "body_path": "docs/tickets/EFA-025.md"
+    },
+    {
+      "id": "EFA-026",
+      "title": "Inspect supported KVA versions and propose metadata imports",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "integrations",
+      "outcome": "Bring known Kinovea working-zone and keyframe information into the catalog with an explicit review step.",
+      "scope": [
+        "Build release-specific KVA fixtures and a read-only normalized summary for recognized working-zone, keyframe, comment, and time-origin fields.",
+        "Present proposed catalog changes alongside the original preserved XML and unsupported elements."
+      ],
+      "non_goals": [
+        "Arbitrary KVA schema compatibility, conversion of every drawing, or automatic writes back to Kinovea."
+      ],
+      "acceptance_checks": [
+        "Fixtures from each declared supported release parse to expected source times and comments.",
+        "Unknown fields are retained in the original sidecar and reported as unsupported rather than discarded.",
+        "An import proposal identifies its sidecar hash, clip source hash, and KVA release/schema.",
+        "The owner must accept a preview before catalog trim or notes change.",
+        "Incorrect video associations or time-origin ambiguity block proposed timestamp updates."
+      ],
+      "dependencies": [
+        "EFA-012",
+        "EFA-019",
+        "EFA-020"
+      ],
+      "risks": [
+        "KVA time origins and import settings can change apparent timestamps.",
+        "A parseable XML file is not proof that every annotation is semantically understood."
+      ],
+      "source_refs": [
+        "KIN-2023",
+        "KIN-2025-2"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 26,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/26"
+      },
+      "body_path": "docs/tickets/EFA-026.md"
+    },
+    {
+      "id": "EFA-027",
+      "title": "Reconcile Kinovea and catalog edits without silent data loss",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "integrations",
+      "outcome": "Return from external technique review with a clear account of what changed on both sides.",
+      "scope": [
+        "Track last-imported sidecar hash and catalog revision; build a three-way comparison for supported fields.",
+        "Apply approved changes as new catalog revisions and preserve original/updated KVA versions."
+      ],
+      "non_goals": [
+        "Bidirectional synchronization of unsupported fields, background sidecar overwrites, or direct changes to the user's original video."
+      ],
+      "acceptance_checks": [
+        "Independent catalog and KVA edits to the same supported field produce an explicit conflict.",
+        "Unchanged fields do not generate duplicate notes or revisions on repeated imports.",
+        "Accepting a proposal records the KVA hash, reviewed changes, and prior/current clip versions.",
+        "Rejecting a proposal leaves both catalog and sidecar bytes intact.",
+        "Unknown KVA elements survive any documented sidecar export; otherwise export is disabled for that schema."
+      ],
+      "dependencies": [
+        "EFA-004",
+        "EFA-026"
+      ],
+      "risks": [
+        "Concurrent external saves can produce partially written sidecars; read atomically or ask for a saved file.",
+        "Timestamp mappings must be versioned and reversible."
+      ],
+      "source_refs": [
+        "KIN-2023"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 27,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/27"
+      },
+      "body_path": "docs/tickets/EFA-027.md"
+    },
+    {
+      "id": "EFA-028",
+      "title": "Launch a Kinovea comparison from saved clip pairs",
+      "milestone": "M2",
+      "priority": "P1",
+      "status": "planned",
+      "area": "integrations",
+      "outcome": "Open a selected pair for detailed external comparison with the correct film context.",
+      "scope": [
+        "Extend the configured Windows launcher for documented second-video arguments and compatible per-clip sidecars.",
+        "Connect a saved comparison to the external handoff while preserving explicit unsupported states."
+      ],
+      "non_goals": [
+        "A Kinovea replacement, DLL embedding, or assuming every installed version supports the same arguments."
+      ],
+      "acceptance_checks": [
+        "Command construction passes both managed video paths as separate arguments and cannot accept request-supplied switches.",
+        "Capability checks distinguish single-video support from a version-qualified comparison launch.",
+        "The comparison record identifies both source hashes and chosen offsets even if Kinovea cannot import every setting.",
+        "Missing or moved executable/sidecars produce useful recovery instructions.",
+        "Real Windows launch acceptance is recorded under the Windows qualification ticket before claiming end-to-end support."
+      ],
+      "dependencies": [
+        "EFA-012",
+        "EFA-022",
+        "EFA-026"
+      ],
+      "risks": [
+        "The documented -video2 option does not establish an undocumented API for importing every catalog setting.",
+        "A comparison handoff must not lose the original source/analysis association."
+      ],
+      "source_refs": [
+        "KIN-2025"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 28,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/28"
+      },
+      "body_path": "docs/tickets/EFA-028.md"
+    },
+    {
+      "id": "EFA-029",
+      "title": "Qualify a pinned external football-cv environment",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "integrations",
+      "outcome": "Make optional analysis reproducible without adding heavy models to every film-room installation.",
+      "scope": [
+        "Define an isolated external environment pinned to the reviewed football-cv revision and explicit dependency/model versions.",
+        "Record actual detector backend, device, weights provenance, licenses, cache location, and diagnostic health output."
+      ],
+      "non_goals": [
+        "Bundling an unreviewed model, silently downloading weights at app startup, or claiming the README detector description matches code."
+      ],
+      "acceptance_checks": [
+        "A declared environment records the football-cv commit and installed dependency versions.",
+        "Preflight reports the actual RF-DETR or torchvision backend and selected device, including unavailable reasons.",
+        "The stale ultralytics dependency guard is investigated with a documented upstream-compatible fix or an explicit requirement.",
+        "Any model acquisition is a separate deliberate setup operation with source/license/checksum recorded.",
+        "The base film library starts and remains usable with the entire CV environment absent."
+      ],
+      "dependencies": [
+        "EFA-001",
+        "EFA-013",
+        "EFA-016"
+      ],
+      "risks": [
+        "The pinned implementation differs from the README's YOLO description; environment behavior must be inspected directly.",
+        "Model code and weights have separate terms; the root Apache-2.0 license does not relicense them."
+      ],
+      "source_refs": [
+        "FCV-DETECT",
+        "FCV-README"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 29,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/29"
+      },
+      "body_path": "docs/tickets/EFA-029.md"
+    },
+    {
+      "id": "EFA-030",
+      "title": "Create manual field calibration with validated geometry",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "analysis",
+      "outcome": "Give the analyzer enough field context to place tracked participants in meaningful coordinates.",
+      "scope": [
+        "Add a source-frame picker and editable pixel-to-field calibration points with units/field profile.",
+        "Store calibration revision, source hash, frame/timestamp, image dimensions, and provenance."
+      ],
+      "non_goals": [
+        "Unreviewed automatic calibration or physical-accuracy claims from too few, collinear, or poorly distributed points."
+      ],
+      "acceptance_checks": [
+        "At least four valid, spatially distributed correspondences are required before a calibration is runnable.",
+        "Non-finite, duplicate, out-of-image, and geometrically degenerate input receives a useful error.",
+        "Saving then reopening calibration preserves its source frame and coordinate/units convention.",
+        "The owner sees a projected grid/reprojection preview and can correct points before analysis.",
+        "Changing source geometry, crop, or orientation invalidates an incompatible calibration until reviewed."
+      ],
+      "dependencies": [
+        "EFA-019",
+        "EFA-020",
+        "EFA-029"
+      ],
+      "risks": [
+        "Wide field visibility and markings may be absent from tight clips.",
+        "Field profiles must make units and coordinate origin explicit instead of relying on undocumented assumptions."
+      ],
+      "source_refs": [
+        "FCV-API",
+        "FCV-SERVER"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 30,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/30"
+      },
+      "body_path": "docs/tickets/EFA-030.md"
+    },
+    {
+      "id": "EFA-031",
+      "title": "Review analysis suitability and pre-snap context",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "analysis",
+      "outcome": "Avoid spending analysis time on clips that cannot support reliable alignment-based positions.",
+      "scope": [
+        "Add a preflight checklist backed by actual clip properties and owner-selected snap/context timestamps.",
+        "Record offense direction, team-color/role review, camera cuts, crop context, and reasons for unsuitable clips."
+      ],
+      "non_goals": [
+        "Automatic play recognition, assuming the ball is visible, or presenting a model snap estimate as ground truth."
+      ],
+      "acceptance_checks": [
+        "A clip with missing calibration or insufficient pre-snap context is marked needs_input with a clear next action.",
+        "Manual snap selection uses the source timestamp/frame mapping and is persisted in the run request.",
+        "Team/direction assignments are explicit reviewed inputs or labeled suggestions.",
+        "A detected or manually marked camera cut prevents treating incompatible calibration as continuous.",
+        "The owner can still catalog/watch an unsuitable clip with analysis disabled."
+      ],
+      "dependencies": [
+        "EFA-020",
+        "EFA-030"
+      ],
+      "risks": [
+        "Very short highlights may omit the alignment that drives position classification.",
+        "Camera movement and jersey-color similarity can degrade geometry and team assignment."
+      ],
+      "source_refs": [
+        "FCV-README",
+        "FCV-API"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 31,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/31"
+      },
+      "body_path": "docs/tickets/EFA-031.md"
+    },
+    {
+      "id": "EFA-032",
+      "title": "Execute bounded, resumable external analysis jobs",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "jobs",
+      "outcome": "Run an optional analysis without freezing review or losing the record of what was processed.",
+      "scope": [
+        "Supervise the configured external Python process using persistent per-run directories and stable play IDs.",
+        "Snapshot inputs, log bounded stage progress, support cancel/retry, and retain terminal failure reasons."
+      ],
+      "non_goals": [
+        "Shell-command input, arbitrary filesystem/executable selection, or silently resuming with changed source/calibration/model inputs."
+      ],
+      "acceptance_checks": [
+        "A run snapshot records source hash, trim/context, calibration revision, provider commit, detector/weights, and command version.",
+        "Process invocation uses argument arrays, managed paths, time/resource limits, and explicit local-only inputs.",
+        "Cancellation terminates owned processes and never advertises partial results as successful.",
+        "A retry creates a new attempt while preserving previous errors and artifacts.",
+        "Restart recovery distinguishes interrupted, retryable, failed, and complete work.",
+        "A deterministic fake runner qualifies supervision independently from later real-model accuracy tests."
+      ],
+      "dependencies": [
+        "EFA-011",
+        "EFA-029",
+        "EFA-030",
+        "EFA-031"
+      ],
+      "risks": [
+        "The upstream analyze API defaults to temporary storage unless a persistent directory is supplied.",
+        "A stuck detector or insufficient GPU memory must not corrupt the library."
+      ],
+      "source_refs": [
+        "FCV-API",
+        "FCV-DETECT"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 32,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/32"
+      },
+      "body_path": "docs/tickets/EFA-032.md"
+    },
+    {
+      "id": "EFA-033",
+      "title": "Import full analysis artifacts with a versioned manifest",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "analysis",
+      "outcome": "Inspect how positions were produced and rebuild overlays without losing intermediate evidence.",
+      "scope": [
+        "Extend the position-only adapter with schemas for detections, tracks, teams, field coordinates, snap, and labels.",
+        "Ingest a manifest with hashes, timebase, transform chain, and links to each immutable per-run artifact."
+      ],
+      "non_goals": [
+        "Accepting arbitrary pickle/model objects, trusting archive paths, or treating partial output as complete analysis."
+      ],
+      "acceptance_checks": [
+        "Fixture bundles from the pinned revision validate against explicit adapter schema versions.",
+        "Every referenced file exists, matches its recorded checksum, and remains inside its managed run directory.",
+        "Frame indices/timestamps and box coordinates are checked against the declared source/proxy transform.",
+        "Missing, malformed, oversized, or wrong-source artifacts block final acceptance with precise diagnostics.",
+        "Position-only imports remain compatible and clearly lack richer track/render capability."
+      ],
+      "dependencies": [
+        "EFA-013",
+        "EFA-019",
+        "EFA-032"
+      ],
+      "risks": [
+        "Upstream stage formats can change without the public README changing.",
+        "Intermediate JSON may be large; limits and streaming/paging decisions need measured fixtures."
+      ],
+      "source_refs": [
+        "FCV-API",
+        "FCV-DETECT",
+        "FCV-OVERLAY"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 33,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/33"
+      },
+      "body_path": "docs/tickets/EFA-033.md"
+    },
+    {
+      "id": "EFA-034",
+      "title": "Render reviewed position overlays with source audio and timing",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "media",
+      "outcome": "Watch useful player-position boxes while retaining the sound and provenance of the original play.",
+      "scope": [
+        "Render optional overlays from validated tracking artifacts and accepted correction layers.",
+        "Preserve source audio according to a documented mapping policy and keep original/overlay playback separately available."
+      ],
+      "non_goals": [
+        "Replacing source footage, silently baking unreviewed names into video, or copying the upstream renderer unchanged."
+      ],
+      "acceptance_checks": [
+        "A generated motion fixture verifies box placement, label timing, output duration, and preserved audio.",
+        "Rendered files cite source hash, run ID, reviewed label revision, and render settings.",
+        "The owner can switch between clean film and the derived overlay without losing the playback moment.",
+        "Failed renders leave no completed artifact and can be rerun from preserved intermediates.",
+        "Unknown/low-quality tracks can be hidden without deleting the raw analysis.",
+        "Different source frame rates and proxy transforms are qualified before being declared supported."
+      ],
+      "dependencies": [
+        "EFA-011",
+        "EFA-020",
+        "EFA-033",
+        "EFA-035"
+      ],
+      "risks": [
+        "The inspected upstream overlay loses source audio and rebuilds time from OpenCV frame rate.",
+        "Variable-frame-rate footage requires timestamp-aware rendering."
+      ],
+      "source_refs": [
+        "FCV-OVERLAY"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 34,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/34"
+      },
+      "body_path": "docs/tickets/EFA-034.md"
+    },
+    {
+      "id": "EFA-035",
+      "title": "Correct suggested positions through a human review ledger",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "review",
+      "outcome": "Fix an incorrect linebacker or quarterback suggestion without erasing what the model originally said.",
+      "scope": [
+        "Provide per-track position correction, rejection/suppression, rationale, and revision history.",
+        "Keep provider output immutable and expose effective reviewed labels as a separate projection."
+      ],
+      "non_goals": [
+        "Training a model automatically, changing the source suggestion payload, or equating accepted position with named roster identity."
+      ],
+      "acceptance_checks": [
+        "Changing a track's position records old suggestion, chosen label, source/run/track IDs, and review time.",
+        "Rejecting a suggestion leaves its original payload available for comparison.",
+        "Only supported position tokens or an explicit unknown/suppressed state can become effective labels.",
+        "An older run's correction is not applied to a new run merely because a numeric track ID repeats.",
+        "Exports and overlays state whether their labels are unreviewed suggestions or human-reviewed values."
+      ],
+      "dependencies": [
+        "EFA-013",
+        "EFA-033"
+      ],
+      "risks": [
+        "Track IDs are scoped to a run and can change on reprocessing.",
+        "A correction UI must preserve uncertainty rather than requiring a guessed position."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 35,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/35"
+      },
+      "body_path": "docs/tickets/EFA-035.md"
+    },
+    {
+      "id": "EFA-036",
+      "title": "Link tracks to roster players through explicit scoped review",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "identity",
+      "outcome": "Find a known player's appearances while keeping identity decisions separate from geometry-based role predictions.",
+      "scope": [
+        "Add manual mapping from run/clip/track/time interval to a roster record with evidence notes.",
+        "Support unknown identity, correction, revocation, and history without automatic cross-game propagation."
+      ],
+      "non_goals": [
+        "Face recognition, automatic persistent biometric identity, or treating a jersey number as globally unique."
+      ],
+      "acceptance_checks": [
+        "A reviewed mapping includes clip ID, run ID, track ID, interval, roster ID, and decision provenance.",
+        "Repeated track IDs in another clip/run have no identity effect.",
+        "Revoking or changing a mapping updates derived player views without rewriting historical decisions.",
+        "Ambiguous/occluded tracks can remain unassigned.",
+        "Player-filter results distinguish manual clip tags from specifically reviewed track identity."
+      ],
+      "dependencies": [
+        "EFA-008",
+        "EFA-033",
+        "EFA-035"
+      ],
+      "risks": [
+        "A stitched track may accidentally include two people; interval-scoped review must allow correction.",
+        "Jerseys and positions can change between games."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 36,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/36"
+      },
+      "body_path": "docs/tickets/EFA-036.md"
+    },
+    {
+      "id": "EFA-037",
+      "title": "Evaluate position quality on representative owner film",
+      "milestone": "M3",
+      "priority": "P1",
+      "status": "planned",
+      "area": "quality",
+      "outcome": "Know which analysis suggestions are useful for this footage and where the owner must review closely.",
+      "scope": [
+        "Create an authorized local evaluation set with varied games, views, lighting, and positions, plus human labels.",
+        "Measure per-class confusion, coverage, track quality, calibration error where available, runtime, and failure reasons."
+      ],
+      "non_goals": [
+        "Committing private game footage, transferring benchmark percentages from another dataset, or declaring success from a single attractive overlay."
+      ],
+      "acceptance_checks": [
+        "Evaluation records source hashes and annotation policy while keeping actual private film outside git.",
+        "Train/tune/evaluate splits keep plays and related frames separated to prevent leakage.",
+        "Results include class counts, unknown/unlabeled cases, and errors as well as aggregate metrics.",
+        "The report compares unreviewed suggestions to reviewed labels and states uncertainty/sample limitations.",
+        "Only supported footage profiles are enabled as qualified; unsupported cases remain review-first.",
+        "A reproducible command and environment manifest permit rerunning the evaluation."
+      ],
+      "dependencies": [
+        "EFA-029",
+        "EFA-030",
+        "EFA-033",
+        "EFA-034",
+        "EFA-035",
+        "EFA-036"
+      ],
+      "risks": [
+        "The upstream roughly 70% result uses 21 private-labeled plays and is not an acceptance threshold for this project.",
+        "Small class populations can make apparently good percentages unstable."
+      ],
+      "source_refs": [
+        "FCV-README"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 37,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/37"
+      },
+      "body_path": "docs/tickets/EFA-037.md"
+    },
+    {
+      "id": "EFA-038",
+      "title": "Transfer calibration between compatible plays with review",
+      "milestone": "M3",
+      "priority": "P2",
+      "status": "planned",
+      "area": "analysis",
+      "outcome": "Reduce repeated field-point marking when clips share a usable camera setup.",
+      "scope": [
+        "Attempt upstream-compatible calibration transfer from an explicitly selected same-game reference.",
+        "Record reference/target hashes, transform quality, candidate points, and a manual accept/edit/reject decision."
+      ],
+      "non_goals": [
+        "Blind reuse across games/camera angles or overwriting an existing manual calibration."
+      ],
+      "acceptance_checks": [
+        "A accepted transfer records its reference calibration revision and target source hash.",
+        "A target with incompatible geometry or inadequate matching is marked failed/needs_review.",
+        "Existing manual calibration is never replaced without an explicit reviewed change.",
+        "A visual grid/reprojection preview exposes a bad transfer before position processing.",
+        "Qualified and deliberately mismatched test pairs demonstrate the rejection path."
+      ],
+      "dependencies": [
+        "EFA-030",
+        "EFA-031",
+        "EFA-033",
+        "EFA-037"
+      ],
+      "risks": [
+        "The same game does not guarantee an unchanged camera or crop.",
+        "Feature matches can look plausible while producing wrong field geometry."
+      ],
+      "source_refs": [
+        "FCV-README",
+        "FCV-API"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 38,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/38"
+      },
+      "body_path": "docs/tickets/EFA-038.md"
+    },
+    {
+      "id": "EFA-039",
+      "title": "Detect and review tracking gaps and identity switches",
+      "milestone": "M3",
+      "priority": "P2",
+      "status": "planned",
+      "area": "analysis",
+      "outcome": "Prevent a convincing overlay from following the wrong player after a collision or occlusion.",
+      "scope": [
+        "Add track-quality flags for impossible jumps, long gaps, fragmented paths, edge exits, and conflicting overlaps.",
+        "Provide reviewed suppress/split/link suggestions with provenance and invalidate affected downstream views."
+      ],
+      "non_goals": [
+        "Claiming perfect multi-object tracking, automatic cross-camera identity, or modifying provider artifacts in place."
+      ],
+      "acceptance_checks": [
+        "Synthetic track fixtures expose known gaps and swaps with reproducible diagnostics.",
+        "A manual split/link decision is scoped to source/run/time and preserves original tracks.",
+        "Changing track continuity marks dependent position/identity/render decisions stale until reviewed.",
+        "Low-quality tracks remain visible as uncertain or can be hidden without pretending they were never detected.",
+        "The real-film evaluation records examples where stitching improves or harms results."
+      ],
+      "dependencies": [
+        "EFA-033",
+        "EFA-035",
+        "EFA-036",
+        "EFA-037"
+      ],
+      "risks": [
+        "Occlusion can make the correct answer unknowable from one view.",
+        "Tracking-quality scores must be calibrated before thresholds become automatic decisions."
+      ],
+      "source_refs": [
+        "FCV-README",
+        "FCV-OVERLAY"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 39,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/39"
+      },
+      "body_path": "docs/tickets/EFA-039.md"
+    },
+    {
+      "id": "EFA-040",
+      "title": "Package a convenient macOS local launcher",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "desktop",
+      "outcome": "Open the film library on the owner's Mac without reconstructing a development environment for every session.",
+      "scope": [
+        "Provide a documented local launcher/bundle that opens the same-origin UI and uses a stable user-data location.",
+        "Qualify Intel/Apple Silicon targets actually available, external FFmpeg setup, process ownership, and clean shutdown."
+      ],
+      "non_goals": [
+        "Claiming Kinovea runs on Apple Silicon, bundling heavy CV models, or claiming notarization/signing that was not performed."
+      ],
+      "acceptance_checks": [
+        "A clean supported Mac can install/start the documented package and reopen the same persisted library.",
+        "Launching twice focuses/reuses or cleanly rejects the second instance instead of starting competing workers.",
+        "Paths with spaces and Unicode work for uploads, data, and export downloads.",
+        "Missing FFmpeg and unavailable Kinovea are visible with useful setup guidance.",
+        "The release matrix records hardware, OS, signing status, and executed checks separately for each tested architecture."
+      ],
+      "dependencies": [
+        "EFA-016",
+        "EFA-021"
+      ],
+      "risks": [
+        "macOS browser review and Kinovea support are separate capabilities.",
+        "Packaging Python and codec executables requires update and licensing discipline."
+      ],
+      "source_refs": [
+        "KIN-DOWNLOAD"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 40,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/40"
+      },
+      "body_path": "docs/tickets/EFA-040.md"
+    },
+    {
+      "id": "EFA-041",
+      "title": "Qualify Windows packaging and live Kinovea workflows",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "desktop",
+      "outcome": "Use the film room and Kinovea together on a real supported Windows installation.",
+      "scope": [
+        "Package or document a repeatable Windows installation and configured external Kinovea path.",
+        "Execute live single/comparison launch, saved sidecar reopening, field mapping, and Unicode/space path checks."
+      ],
+      "non_goals": [
+        "Emulating native acceptance through mocks, redistributing Kinovea source inside this repository, or assuming every old release behaves identically."
+      ],
+      "acceptance_checks": [
+        "The test record names Windows, CPU architecture, Kinovea release, Python/runtime, and FFmpeg versions.",
+        "A managed source opens in the configured Kinovea application and a saved KVA can be preserved/reopened.",
+        "The -video2 comparison handoff is tested on the declared supported release.",
+        "Unsupported KVA versions and unavailable executables fail clearly without changing the catalog.",
+        "Core import/trim/export retains audio and source hash on Windows.",
+        "Installer/launcher uninstall leaves user media and the database intact."
+      ],
+      "dependencies": [
+        "EFA-012",
+        "EFA-016",
+        "EFA-021",
+        "EFA-026",
+        "EFA-027",
+        "EFA-028"
+      ],
+      "risks": [
+        "Command-line quoting and file locks behave differently on Windows.",
+        "Success with one Kinovea version does not qualify every version."
+      ],
+      "source_refs": [
+        "KIN-DOWNLOAD",
+        "KIN-2025",
+        "KIN-2025-2"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 41,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/41"
+      },
+      "body_path": "docs/tickets/EFA-041.md"
+    },
+    {
+      "id": "EFA-042",
+      "title": "Back up and restore a complete film library",
+      "milestone": "M4",
+      "priority": "P0",
+      "status": "planned",
+      "area": "recovery",
+      "outcome": "Recover the owner's clips, labels, sidecars, and review history on a replacement computer.",
+      "scope": [
+        "Create a consistent SQLite backup plus a versioned manifest for sources, derived files, notes, revisions, playlists, KVA, and analysis records.",
+        "Restore into a new managed workspace with checksum verification and a dry-run report."
+      ],
+      "non_goals": [
+        "Automatic cloud upload, treating a database-only copy as a complete backup, or overwriting a live library without explicit reviewed intent."
+      ],
+      "acceptance_checks": [
+        "Backup taken while the app is active contains a consistent database snapshot and an explicit policy for in-flight jobs.",
+        "Restore into an empty workspace preserves IDs, relationships, source hashes, history, and playlists.",
+        "Missing/corrupt manifest files are reported before the restore is activated.",
+        "Untrusted archive paths, symlinks, and oversized members cannot escape the destination.",
+        "The process is resumable or safely restartable and never deletes originals to make room.",
+        "A documented recovery drill opens restored clips and exports a verified audio-preserving trim."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-010",
+        "EFA-011",
+        "EFA-012",
+        "EFA-013",
+        "EFA-016"
+      ],
+      "risks": [
+        "Derived caches can be regenerated, but original film and reviewed decisions must be included or explicitly identified as missing.",
+        "File-by-file copying of an actively written database is not a sufficient consistency strategy."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 42,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/42"
+      },
+      "body_path": "docs/tickets/EFA-042.md"
+    },
+    {
+      "id": "EFA-043",
+      "title": "Export portable metadata and selected film packages",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "interchange",
+      "outcome": "Carry organized review work into another application or share a selected set as files.",
+      "scope": [
+        "Export stable JSON/CSV metadata and a selected clip/playlist package with provenance manifests.",
+        "Include optional trimmed MP4s, notes, and preserved sidecars under deterministic safe filenames."
+      ],
+      "non_goals": [
+        "Sending files to other people automatically, public links, or presenting editable KVA metadata as burned-in video text."
+      ],
+      "acceptance_checks": [
+        "A package identifies source clip/hash, selected interval, label revision, playlist order, and included files.",
+        "Metadata preserves Unicode, multiple tags/players, and null/optional values without ambiguity.",
+        "CSV output escapes delimiters/newlines and handles spreadsheet-formula injection safely.",
+        "The owner can export metadata without copying original or derived videos.",
+        "Package inspection/import validates checksums/schema and does not run executable content.",
+        "A selected package contains only the requested clips and associated records."
+      ],
+      "dependencies": [
+        "EFA-011",
+        "EFA-016",
+        "EFA-042"
+      ],
+      "risks": [
+        "CSV cannot naturally represent every nested relationship; JSON is the canonical round-trip form.",
+        "Annotation comments remain metadata unless an explicit render/export operation makes them visible."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 43,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/43"
+      },
+      "body_path": "docs/tickets/EFA-043.md"
+    },
+    {
+      "id": "EFA-044",
+      "title": "Harden database migration and interrupted-write recovery",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "recovery",
+      "outcome": "Upgrade the application or recover from disk problems without losing a usable library.",
+      "scope": [
+        "Introduce versioned, reversible-where-feasible migrations and backup-before-upgrade checks.",
+        "Handle disk-full, database lock, interrupted copy, and interrupted publication paths with explicit recovery state."
+      ],
+      "non_goals": [
+        "Silently repairing unknown corruption, downgrading incompatible schemas, or deleting film to free space."
+      ],
+      "acceptance_checks": [
+        "Migrating a prior-version fixture preserves clip IDs, source hashes, revisions, and relationships.",
+        "An interrupted migration rolls back or leaves a documented recoverable backup; partial schema is not opened as healthy.",
+        "A newer unsupported database version is rejected with recovery guidance.",
+        "Injected disk-full and permission failures do not mark media/artifacts complete.",
+        "Startup identifies missing sources/orphan partial outputs without treating them as normal clips.",
+        "Recovery procedures are demonstrated on copied fixtures rather than the only copy of user film."
+      ],
+      "dependencies": [
+        "EFA-002",
+        "EFA-011",
+        "EFA-016",
+        "EFA-042"
+      ],
+      "risks": [
+        "Database atomicity does not by itself make filesystem writes atomic.",
+        "Reversible migration depends on retaining old data and backups."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 44,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/44"
+      },
+      "body_path": "docs/tickets/EFA-044.md"
+    },
+    {
+      "id": "EFA-045",
+      "title": "Show storage health and safely reclaim derived caches",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "storage",
+      "outcome": "Understand disk use and remove reproducible previews/exports without risking original game film.",
+      "scope": [
+        "Report storage use by originals, thumbnails, exports, analysis artifacts, temporary files, and backups.",
+        "Offer a concrete selection/preview for deleting regenerable caches and completed export copies, with reference checks."
+      ],
+      "non_goals": [
+        "Original-source deletion, removing the only copy of a reviewed sidecar, or assuming archive means safe to erase."
+      ],
+      "acceptance_checks": [
+        "Storage totals identify the managed paths and artifact types being counted.",
+        "Cleanup preview states which files will be removed and whether each can be regenerated.",
+        "Running jobs, active downloads, and required provenance artifacts are excluded or safely coordinated.",
+        "Cleanup rejects paths outside the managed workspace and refuses original media.",
+        "Deleting a thumbnail/export leaves clip metadata, source film, review history, and playlists usable.",
+        "Failed deletions report remaining files rather than claiming all space was recovered."
+      ],
+      "dependencies": [
+        "EFA-009",
+        "EFA-011",
+        "EFA-042",
+        "EFA-044"
+      ],
+      "risks": [
+        "Analysis outputs may be expensive or impossible to recreate with a missing old model; classify retention carefully.",
+        "Backups may depend on files that look like duplicates."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 45,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/45"
+      },
+      "body_path": "docs/tickets/EFA-045.md"
+    },
+    {
+      "id": "EFA-046",
+      "title": "Qualify larger libraries and a representative media matrix",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "quality",
+      "outcome": "Keep film retrieval and playback useful after a season of clips and varied camera formats.",
+      "scope": [
+        "Benchmark a synthetic catalog with 10,000 clips and realistic many-to-many labels/playlists.",
+        "Test declared codecs, resolutions, frame rates, orientation metadata, silent/audio sources, and slow/damaged files."
+      ],
+      "non_goals": [
+        "Universal codec guarantees, invented hardware performance, or repeated optional tests after a stated gate is satisfied."
+      ],
+      "acceptance_checks": [
+        "On the recorded reference machine, paginated common filters over 10,000 metadata records meet a documented 500 ms p95 target or remain unqualified.",
+        "Browser browsing remains bounded rather than loading every full clip/media resource at once.",
+        "The supported media matrix records import, preview, range playback, exact export, and audio outcomes separately.",
+        "Unsupported formats receive actionable messages instead of a successful-looking broken thumbnail.",
+        "Large imports/exports do not starve metadata editing and job state remains truthful.",
+        "Benchmarks include schema/index/query details sufficient to reproduce observed limits."
+      ],
+      "dependencies": [
+        "EFA-007",
+        "EFA-011",
+        "EFA-014",
+        "EFA-020",
+        "EFA-044"
+      ],
+      "risks": [
+        "Metadata query latency and media decode latency are different measurements.",
+        "High-resolution or variable-frame-rate footage may need an explicit proxy policy."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 46,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/46"
+      },
+      "body_path": "docs/tickets/EFA-046.md"
+    },
+    {
+      "id": "EFA-047",
+      "title": "Maintain dependency provenance and upstream upgrade gates",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "maintenance",
+      "outcome": "Keep integrations reproducible and avoid breaking the film library when dependencies or external projects change.",
+      "scope": [
+        "Record a dependency inventory, lock strategy, license notices, external model sources, and pinned adapter compatibility.",
+        "Create an update checklist that reviews upstream changes, schema fixtures, and affected qualified workflows."
+      ],
+      "non_goals": [
+        "Relicensing upstream code, claiming one root license covers model weights, or copying unlicensed alternatives."
+      ],
+      "acceptance_checks": [
+        "The repository retains Apache-2.0 for original code and documents separately governed external tools/dependencies.",
+        "football-cv code commit, backend versions, and weight artifacts are independently identifiable.",
+        "Updating an adapter pin requires fixture/schema regression checks and a reviewed capability change note.",
+        "Kinovea stays external and GPL/AGPL alternatives are referenced without source ingestion.",
+        "A release inventory distinguishes distributed dependencies from optional user-installed tools.",
+        "The policy provides a safe rollback pin and does not auto-update analysis components at app startup."
+      ],
+      "dependencies": [
+        "EFA-016",
+        "EFA-029"
+      ],
+      "risks": [
+        "A license declaration in a README does not establish the terms of every bundled asset.",
+        "README/code drift is already observed in football-cv's detector."
+      ],
+      "source_refs": [
+        "FCV-DETECT",
+        "FCV-README",
+        "KIN-DOWNLOAD"
+      ],
+      "evidence": [],
+      "github_issue": {
+        "number": 47,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/47"
+      },
+      "body_path": "docs/tickets/EFA-047.md"
+    },
+    {
+      "id": "EFA-048",
+      "title": "Run a complete owner-workflow release qualification",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "planned",
+      "area": "release",
+      "outcome": "Deliver a release the owner can trust for repeated real film review, with remaining limits explicitly recorded.",
+      "scope": [
+        "Execute the import/tighten/label/retrieve/review/compare/playlist/export/backup/restore journey on each declared platform.",
+        "Publish the capability matrix, installation/recovery guide, test evidence, open defects, and rollback instructions."
+      ],
+      "non_goals": [
+        "Declaring optional CV qualified without representative evaluation, closing tickets solely because code exists, or auto-merging without authorization."
+      ],
+      "acceptance_checks": [
+        "Every claimed feature maps to a ticket, code revision, environment, and executed acceptance evidence.",
+        "A representative owner-approved film workflow completes without altered source hashes or lost review decisions.",
+        "A backup/restore drill demonstrates retrieval and export after migration to a clean workspace.",
+        "Windows Kinovea and each CV environment are labeled qualified, unsupported, or unrun separately from browser functionality.",
+        "Any open release-blocking issue prevents the corresponding support claim.",
+        "Release notes distinguish implemented candidates, locally verified behavior, merged completion, and planned expansion."
+      ],
+      "dependencies": [
+        "EFA-021",
+        "EFA-022",
+        "EFA-023",
+        "EFA-025",
+        "EFA-027",
+        "EFA-034",
+        "EFA-035",
+        "EFA-036",
+        "EFA-037",
+        "EFA-040",
+        "EFA-041",
+        "EFA-042",
+        "EFA-043",
+        "EFA-044",
+        "EFA-045",
+        "EFA-046",
+        "EFA-047"
+      ],
+      "risks": [
+        "A single green environment does not qualify every operating system or camera setup.",
+        "Full qualification may deliberately ship a limited capability matrix if optional analysis remains experimental."
+      ],
+      "source_refs": [],
+      "evidence": [],
+      "github_issue": {
+        "number": 48,
+        "url": "https://github.com/mfreeze77/exais-football-ai/issues/48"
+      },
+      "body_path": "docs/tickets/EFA-048.md"
+    }
+  ]
+}
