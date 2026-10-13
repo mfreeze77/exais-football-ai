@@ -1,0 +1,27 @@
+name: Recover unpublished backlog
+on:
+  push:
+    branches: [build/backlog-film-study-cv-recovery]
+    paths: [.github/workflows/recover-backlog.yml]
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Preserve exact previous source and transport for verification
+        run: |
+          git archive --format=tar.gz --output="$RUNNER_TEMP/current-source.tar.gz" HEAD
+          tar -czf "$RUNNER_TEMP/prior-transport.tar.gz" _recovery
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backlog-recovery-context
+          path: |
+            ${{ runner.temp }}/current-source.tar.gz
+            ${{ runner.temp }}/prior-transport.tar.gz
+          retention-days: 3
