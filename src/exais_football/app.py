@@ -6,6 +6,7 @@ import logging
 import mimetypes
 import os
 import shutil
+import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -18,8 +19,9 @@ from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 
-from . import __version__
+from . import __version__, cv_environment, cv_routes
 from .config import InstanceLock, Settings
+from .cv_jobs import register_cv
 from .integrations import football_cv, kinovea
 from .jobs import ExportJobs
 from .media import MediaError, media_capabilities
@@ -37,7 +39,9 @@ from .models import (
     ReviewStatus,
 )
 from .service import Catalog, CatalogError, file_sha256
+from .storage import LeasedFileResponse
 from .taxonomy_routes import router as taxonomy_router
+from .workspace import workspace_lock
 
 STATIC = Path(__file__).parent / "static"
 KVA_LIMIT = 2 * 1024**2
@@ -114,6 +118,10 @@ class LocalGuard:
         limit = 256 * 1024
         if path == "/api/imports":
             limit = self.max_upload_bytes + 1024**2
+        elif path.endswith("/snapshots"):
+            limit = 12 * 1024**2
+        elif path.startswith("/api/cv/clips/") and path.endswith("/runs"):
+            limit = 64 * 1024**2 + 64 * 1024
         elif path.endswith("/kinovea/annotations"):
             limit = KVA_LIMIT + 64 * 1024
         try:
@@ -160,6 +168,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     catalog = Catalog(settings)
     jobs = ExportJobs(catalog)
+    from .work import WorkJobs, register_recovery
+    from .work_routes import router as work_router
+
+    work = WorkJobs(catalog)
+    register_recovery(work)
+    register_cv(work)
     instance_lock = InstanceLock(settings.path("instance.lock"))
 
     @asynccontextmanager
@@ -167,9 +181,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         instance_lock.acquire()
         try:
             jobs.start()
+            work.start()
             yield
         finally:
             try:
+                await run_in_threadpool(work.stop)
                 await run_in_threadpool(jobs.stop)
             finally:
                 instance_lock.release()
@@ -183,12 +199,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/api/openapi.json",
     )
     app.include_router(taxonomy_router(catalog))
+    app.state.instance_id = str(uuid4())
     app.state.catalog, app.state.jobs = catalog, jobs
+    app.state.work = work
     app.add_middleware(LocalGuard, max_upload_bytes=settings.max_upload_bytes)
 
     @app.exception_handler(CatalogError)
     async def catalog_error(request, error):
         return error_response(error.code, error.message, error.status)
+
+    @app.exception_handler(sqlite3.Error)
+    async def storage_error(request, error):
+        logger.error("Catalog storage failure", exc_info=error)
+        return error_response(
+            "catalog_storage_error",
+            (
+                "Catalog write failed. Check disk space and "
+                "permissions; no partial transaction was accepted"
+            ),
+            503,
+        )
 
     @app.exception_handler(MediaError)
     async def media_error(request, error):
@@ -208,17 +238,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/api/health")
     def health():
-        cv_reason = (
-            "Import output from an external football-cv setup; model execution is not bundled"
-        )
         return {
             "status": "ok",
+            "instance_id": app.state.instance_id,
             "version": __version__,
             "max_upload_bytes": settings.max_upload_bytes,
             "capabilities": {
                 **media_capabilities(),
                 "kinovea": kinovea.capability(settings.kinovea_executable),
-                "football_cv": {"available": False, "reason": cv_reason, "result_import": True},
+                "football_cv": {**cv_environment.capability(catalog), "result_import": True},
             },
         }
 
@@ -314,7 +342,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         path = settings.path(f"thumbnails/{clip_id}.jpg")
         if not path.is_file():
             raise CatalogError("preview_missing", "A preview is unavailable for this clip", 404)
-        return FileResponse(path, media_type="image/jpeg")
+        with workspace_lock(catalog):
+            return LeasedFileResponse(path, media_type="image/jpeg")
 
     @app.get("/api/clips/{clip_id}/notes")
     def notes_list(clip_id: UUID):
@@ -351,9 +380,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.api_route("/api/jobs/{job_id}/file", methods=["GET", "HEAD"])
     def job_download(job_id: UUID):
-        return FileResponse(
-            jobs.file(str(job_id)), media_type="video/mp4", filename=f"exais-{job_id}.mp4"
-        )
+        with workspace_lock(catalog):
+            return LeasedFileResponse(
+                jobs.file(str(job_id)), media_type="video/mp4", filename=f"exais-{job_id}.mp4"
+            )
 
     @app.get("/api/tags")
     def tags():
@@ -457,5 +487,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def index():
         return FileResponse(STATIC / "index.html", media_type="text/html")
 
+    from .study_routes import router as study_router
+
+    app.include_router(study_router(catalog))
+
+    from .kva_routes import router as kva_router
+
+    app.include_router(kva_router(catalog))
+    app.include_router(work_router(catalog, work))
+    app.include_router(cv_routes.router(catalog, work))
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
     return app

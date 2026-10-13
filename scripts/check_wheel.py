@@ -17,6 +17,18 @@ required = {
     "exais_football/static/taxonomy.css",
     "exais_football/static/tag-input.js",
 }
+required.update(
+    {
+        "exais_football/static/study-tools.css",
+        "exais_football/native_comparison.py",
+        "exais_football/static/cv-panel.js",
+        "exais_football/static/tools-common.js",
+        "exais_football/static/study-players.js",
+        "exais_football/cv_worker.py",
+        "exais_football/static/study-ui.js",
+        "exais_football/static/drawing-board.js",
+    }
+)
 wheels = sorted(Path("dist").glob("*.whl"))
 if not wheels:
     raise SystemExit("No built wheel found")

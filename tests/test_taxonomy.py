@@ -395,7 +395,7 @@ def test_v1_migration_preserves_history_and_consistent_backup(tmp_path):
         assert backup.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
         assert backup.execute("SELECT tag FROM clip_tags").fetchone()[0] == "unfamiliar/é"
     with database.connection() as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         assert connection.execute("SELECT tag FROM clip_tags").fetchone()[0] == "unfamiliar/é"
         assert (
             connection.execute("SELECT snapshot FROM revisions").fetchone()[0]
@@ -499,7 +499,7 @@ def test_concurrent_fresh_start_never_reinitializes_v2(tmp_path):
     with ThreadPoolExecutor(max_workers=2) as pool:
         list(pool.map(lambda _: Database(path), range(2)))
     with Database(path).connection() as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
         assert connection.execute("SELECT count(*) FROM tag_groups").fetchone()[0] == 6
     assert not list(tmp_path.glob("catalog.pre-taxonomy-v2.*.sqlite3"))
 

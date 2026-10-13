@@ -55,6 +55,8 @@ class ExportJobs:
         )
         record["provenance"] = {
             "source_sha256": snapshot["source_sha256"],
+            "source_asset_id": snapshot.get("source_asset_id"),
+            "clip_id": record["clip_id"],
             "start_seconds": snapshot["start_seconds"],
             "end_seconds": snapshot["end_seconds"],
             "clip_version": record["clip_version"],

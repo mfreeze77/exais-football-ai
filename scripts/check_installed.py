@@ -71,6 +71,16 @@ def main() -> None:
                 "/static/taxonomy.css": "text/css",
                 "/static/tag-input.js": "javascript",
             }
+            assets.update(
+                {
+                    "/static/study-ui.js": "javascript",
+                    "/static/study-players.js": "javascript",
+                    "/static/drawing-board.js": "javascript",
+                    "/static/cv-panel.js": "javascript",
+                    "/static/tools-common.js": "javascript",
+                    "/static/study-tools.css": "text/css",
+                }
+            )
             for route, media_type in assets.items():
                 with urllib.request.urlopen(origin + route, timeout=5) as response:
                     assert response.status == 200
