@@ -51,7 +51,7 @@ jobs:
         run: |
           npm install --no-save --package-lock=false playwright@1.62.1
           npx playwright install --with-deps firefox
-      - name: Exercise the complete browser film workflow
+      - name: Exercise the original and recovered browser workflows
         if: matrix.python == '3.12'
         env:
           UI_BROWSER: firefox
@@ -60,6 +60,7 @@ jobs:
           for file in src/exais_football/static/*.js scripts/*.mjs; do node --check "$file"; done
           node scripts/tag_input_test.mjs
           node scripts/ui_smoke.mjs
+          node scripts/backlog_ui.mjs
       - name: Retain synthetic browser qualification screenshots
         if: always() && matrix.python == '3.12'
         uses: actions/upload-artifact@v4
