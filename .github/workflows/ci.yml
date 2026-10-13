@@ -8,6 +8,19 @@ permissions:
   contents: read
 
 jobs:
+  qualification-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Obtain the same formatter used by the locked qualification environment
+        run: python -m pip download --only-binary=:all: --no-deps ruff==0.17.0 --dest tooling
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualification-formatter
+          path: tooling/
+          retention-days: 1
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -40,7 +53,7 @@ jobs:
           python -m venv /tmp/exais-wheel-check
           /tmp/exais-wheel-check/bin/python -m pip install dist/*.whl
           cd /tmp
-          /tmp/exais-wheel-check/bin/exais-football doctor
+          /tmp/exais-wheel-check/bin/exais-football-ai doctor
           /tmp/exais-wheel-check/bin/python "$GITHUB_WORKSPACE/scripts/check_installed.py"
       - uses: actions/setup-node@v4
         if: matrix.python == '3.12'
