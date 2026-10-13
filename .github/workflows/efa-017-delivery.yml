@@ -1,11 +1,10 @@
-# One-time, exact-tree delivery of the locally qualified EFA-017 candidate.
-# This workflow and its transport files remove themselves from the published tree.
+# One-time exact-tree delivery. This workflow and transport files remove themselves.
 name: EFA-017 verified candidate delivery
 on:
   push:
     branches: ['feat/efa-017-football-tag-taxonomy']
     paths:
-      - '_delivery/efa-017-*.b64'
+      - '_delivery/efa-017-*'
       - '.github/workflows/efa-017-delivery.yml'
 permissions:
   contents: read
@@ -29,11 +28,10 @@ jobs:
           python-version: '3.12'
       - name: Verify transport and the complete intended source tree
         run: |
-          test "$(git rev-parse HEAD^)" = '687e77e7510218195865fa2a0a848766872f0e4b'
+          test "$(git rev-parse HEAD^)" = '114c8d5cc827b5d9d82d23c64f46c192ad638cca'
           python - <<'PY'
           import base64, gzip, hashlib, os, pathlib
           parts = [pathlib.Path(f'_delivery/efa-017-{i}.b64').read_text().strip() for i in (1, 2, 3)]
-          # Repair one identified transport-copy insertion, not any application source.
           assert parts[0].count('leKKkeIvOG') == 1
           parts[0] = parts[0].replace('leKKkeIvOG', 'leKkeIvOG', 1)
           encoded = ''.join(parts) + '\n'
@@ -42,12 +40,14 @@ jobs:
           assert len(patch) == 133243
           assert hashlib.sha256(patch).hexdigest() == 'ffd24b12198117e495156a8851cb85629d01d5c4df0adca40e31bd2b1e7184b7'
           pathlib.Path(os.environ['RUNNER_TEMP'], 'efa-017.patch').write_bytes(patch)
-          print('Verified exact locally tested EFA-017 patch bytes.')
+          print('Verified exact EFA-017 patch bytes.')
           PY
           git apply --index --check "$RUNNER_TEMP/efa-017.patch"
           git apply --index "$RUNNER_TEMP/efa-017.patch"
-          git rm -- .github/workflows/efa-017-delivery.yml _delivery/efa-017-1.b64 _delivery/efa-017-2.b64 _delivery/efa-017-3.b64
-          test "$(git write-tree)" = 'a07970dd1a5d435e6d18b4b731e7beac14359307'
+          git apply --index --check _delivery/efa-017-wal.patch
+          git apply --index _delivery/efa-017-wal.patch
+          git rm -- .github/workflows/efa-017-delivery.yml _delivery/efa-017-1.b64 _delivery/efa-017-2.b64 _delivery/efa-017-3.b64 _delivery/efa-017-wal.patch
+          test "$(git write-tree)" = '5fbf8df2d1e3a113ac6f31178698a1efecbe3f8a'
           git archive --format=tar.gz --output="$RUNNER_TEMP/efa-017-verified-source.tar.gz" "$(git write-tree)"
       - name: Qualify the candidate in the locked Python environment
         run: |
@@ -67,10 +67,10 @@ jobs:
           remote_head="$(git ls-remote origin "refs/heads/$branch" | cut -f1)"
           test "$remote_head" = "$GITHUB_SHA"
           git diff --exit-code
-          test "$(git write-tree)" = 'a07970dd1a5d435e6d18b4b731e7beac14359307'
+          test "$(git write-tree)" = '5fbf8df2d1e3a113ac6f31178698a1efecbe3f8a'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'EFA-017: implement complete tag groups, presets, aliases, and reviewed migrations' -m 'Exact source tree a07970dd1a5d435e6d18b4b731e7beac14359307; locally tested with 121 passing tests. This delivery also passes the locked Python suite and removes its one-time transport workflow. Full browser/matrix qualification remains the draft PR gate.'
+          git commit -m 'EFA-017: implement complete tag groups, presets, aliases, and reviewed migrations' -m 'Exact verified source tree 5fbf8df2d1e3a113ac6f31178698a1efecbe3f8a. Qualifies locked Python tests and build, including bounded WAL startup-race recovery. Removes the one-time delivery workflow and transport. Full browser/matrix checks remain the draft PR gate.'
           git push origin "HEAD:refs/heads/$branch"
           git log -1 --format='%H %T' > "$RUNNER_TEMP/efa-017-published-revision.txt"
       - name: Retain delivery evidence
