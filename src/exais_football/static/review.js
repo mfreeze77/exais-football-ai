@@ -1,6 +1,8 @@
 import { api, upload, localURL } from "./api.js";
 import { $, $$, el, button, icon, iconButton, duration, friendly, dateLabel, fillSelect, toast, choose, isEditing } from "./ui.js";
 
+import { parseTags, formatTags } from "./tag-input.js";
+
 const editableIds = ["edit-title", "edit-game", "edit-phase", "edit-status", "edit-tags", "edit-description", "edit-favorite", "edit-archived", "trim-start", "trim-end"];
 
 export class ReviewController {
@@ -18,10 +20,21 @@ export class ReviewController {
     this.loading = false;
     this.frameRequest = 0;
     this.advancedLoaded = false;
+    this.taxonomy = null;
     this.bind();
   }
 
   bind() {
+    $("#review-tag-group").addEventListener("change", () => this.renderTagChoices());
+    $("#review-add-tag").addEventListener("click", () => {
+      const tag = this.taxonomy?.tags.find(item => item.id === $("#review-tag-choice").value);
+      if (tag) this.addDraftTags([tag.name]);
+    });
+    $("#review-add-preset").addEventListener("click", () => {
+      const preset = this.taxonomy?.presets.find(item => item.id === $("#review-preset").value);
+      if (preset) this.addDraftTags(this.taxonomy.tags.filter(tag => preset.tag_ids.includes(tag.id)).map(tag => tag.name));
+    });
+    $("#edit-tags").addEventListener("input", () => this.validateTagInput());
     $("#review-close").addEventListener("click", () => this.requestClose());
     this.dialog.addEventListener("cancel", event => { event.preventDefault(); this.requestClose(); });
     this.dialog.addEventListener("close", () => { this.video.pause(); cancelAnimationFrame(this.frameRequest); });
@@ -125,10 +138,12 @@ export class ReviewController {
     $("#export-clip").disabled = true;
     $("#review-conflict").hidden = true;
     try {
-      const [clipResult, notesResult] = await Promise.allSettled([api(`/clips/${encodeURIComponent(id)}`), api(`/clips/${encodeURIComponent(id)}/notes`)]);
+      const [clipResult, notesResult, taxonomyResult] = await Promise.allSettled([api(`/clips/${encodeURIComponent(id)}`), api(`/clips/${encodeURIComponent(id)}/notes`), api("/taxonomy")]);
       if (token !== this.token || !this.dialog.open) return;
       if (clipResult.status === "rejected") throw clipResult.reason;
       this.clip = clipResult.value;
+      this.taxonomy = taxonomyResult.status === "fulfilled" ? taxonomyResult.value : null;
+      this.renderTerminology();
       this.notes = notesResult.status === "fulfilled" ? notesResult.value : [];
       if (notesResult.status === "rejected") toast(`Clip opened, but notes could not load: ${notesResult.reason.message}`, "error");
       this.advancedLoaded = false;
@@ -156,7 +171,8 @@ export class ReviewController {
     fillSelect($("#edit-game"), catalog.games, "No game assigned", clip.game_id);
     $("#edit-phase").value = clip.phase;
     $("#edit-status").value = clip.review_status;
-    $("#edit-tags").value = (clip.tags || []).join(", ");
+    $("#edit-tags").value = formatTags(clip.tags || []);
+    this.validateTagInput();
     $("#edit-description").value = clip.description || "";
     $("#edit-favorite").checked = clip.favorite;
     $("#edit-archived").checked = clip.archived;
@@ -198,6 +214,45 @@ export class ReviewController {
     if (!$("#advanced-panel").hidden) this.loadAdvanced();
   }
 
+  validateTagInput() {
+    try { parseTags($("#edit-tags").value); $("#edit-tags").setCustomValidity(""); }
+    catch (error) { $("#edit-tags").setCustomValidity(error.message); }
+  }
+
+  draftTags() {
+    try { return parseTags($("#edit-tags").value); }
+    catch { return [$("#edit-tags").value]; } // Draft remains visible; form validation blocks save.
+  }
+
+  renderTerminology() {
+    const state = this.taxonomy;
+    fillSelect($("#review-tag-group"), [...(state?.groups || []), { id: "__ungrouped__", name: "Ungrouped" }], "All groups", "");
+    fillSelect($("#review-preset"), state?.presets || [], "Choose a preset", "");
+    this.renderTagChoices();
+    $("#review-add-preset").disabled = !state?.presets.length;
+    $("#review-taxonomy-status").textContent = state ? "Adds to your draft; Save changes to keep it. The clip's Phase and other details are unchanged." : "Terminology could not load. Free-text tags still work; reopen the clip to retry.";
+  }
+
+  renderTagChoices() {
+    const group = $("#review-tag-group").value;
+    const tags = (this.taxonomy?.tags || []).filter(tag => !group || (group === "__ungrouped__" ? !tag.group_id : tag.group_id === group));
+    fillSelect($("#review-tag-choice"), tags, "Choose a tag", "");
+    $("#review-add-tag").disabled = !tags.length;
+  }
+
+  addDraftTags(names) {
+    if (!this.clip || this.loading || this.saving) return;
+    try {
+      const current = parseTags($("#edit-tags").value);
+      const tags = [...new Set([...current, ...names])];
+      if (tags.length > 40) throw new Error("A clip supports at most 40 tags. Remove a label before adding this preset.");
+      $("#edit-tags").value = formatTags(tags);
+      this.validateTagInput();
+      this.updateDraftState();
+      $("#review-taxonomy-status").textContent = "Labels added to the draft; existing labels and other edits are retained. Save changes to keep them.";
+    } catch (error) { $("#review-taxonomy-status").textContent = error.message; }
+  }
+
   draft() {
     return {
       title: $("#edit-title").value.trim(),
@@ -205,7 +260,7 @@ export class ReviewController {
       phase: $("#edit-phase").value,
       review_status: $("#edit-status").value,
       description: $("#edit-description").value,
-      tags: [...new Set($("#edit-tags").value.split(",").map(value => value.trim()).filter(Boolean))],
+      tags: this.draftTags(),
       player_ids: $$('#edit-players input:checked').map(input => input.value).sort(),
       favorite: $("#edit-favorite").checked,
       archived: $("#edit-archived").checked,
@@ -260,6 +315,11 @@ export class ReviewController {
       if (token !== this.token) return false;
       this.clip = saved;
       this.baseline = baselineAfterSave;
+      if (JSON.stringify(this.draft().tags) === JSON.stringify(draft.tags)) {
+        $("#edit-tags").value = formatTags(saved.tags);
+        this.validateTagInput();
+        this.baseline = JSON.stringify({ ...draft, tags: saved.tags });
+      }
       $("#review-title").textContent = saved.title;
       $("#review-conflict").hidden = true;
       this.onSaved(saved);

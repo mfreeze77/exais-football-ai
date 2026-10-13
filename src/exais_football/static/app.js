@@ -1,6 +1,7 @@
 import { api, upload, localURL, queryString } from "./api.js";
 import { $, $$, el, icon, button, iconButton, duration, filmTime, friendly, dateLabel, fillSelect, toast, choose, debounce, mountIcons } from "./ui.js";
 import { ReviewController } from "./review.js";
+import { TaxonomyManager } from "./taxonomy.js";
 
 const state = {
   games: [], players: [], tags: [], playlists: [], clips: [], total: 0,
@@ -24,6 +25,13 @@ const review = new ReviewController({
   },
 });
 
+const terminology = new TaxonomyManager(async result => {
+  const selected = $("#filter-tag").value;
+  const preferred = result.result?.source.name === selected ? result.result.target.name : selected;
+  await loadTags(preferred);
+  await Promise.all([loadClips(), loadStats()]);
+});
+
 function reportBackgroundFailures(results) {
   const failure = results.find(item => item.status === "rejected");
   if (failure) toast(failure.reason.message, "error");
@@ -42,9 +50,9 @@ async function loadStats() {
   $("#stat-games").textContent = String(stats.games);
 }
 
-async function loadTags() {
+async function loadTags(preferred = $("#filter-tag").value) {
   state.tags = await api("/tags");
-  fillSelect($("#filter-tag"), state.tags, "All tags", $("#filter-tag").value, item => `${item.name} (${item.count})`);
+  fillSelect($("#filter-tag"), state.tags, "All tags", preferred, item => `${item.name} (${item.count})`);
 }
 
 async function loadCatalogs() {
@@ -657,7 +665,7 @@ function bind() {
   });
   window.addEventListener("beforeunload", event => {
     const formDraft = $$('#manage-dialog input, #manage-dialog textarea, #playlist-dialog input, #playlist-dialog textarea').some(input => input.value.trim());
-    if (state.uploading || review.hasUnsavedWork() || formDraft || pickerDirty()) { event.preventDefault(); event.returnValue = ""; }
+    if (state.uploading || terminology.hasUnsavedWork() || review.hasUnsavedWork() || formDraft || pickerDirty()) { event.preventDefault(); event.returnValue = ""; }
   });
 }
 

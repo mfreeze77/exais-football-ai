@@ -37,6 +37,7 @@ from .models import (
     ReviewStatus,
 )
 from .service import Catalog, CatalogError, file_sha256
+from .taxonomy_routes import router as taxonomy_router
 
 STATIC = Path(__file__).parent / "static"
 KVA_LIMIT = 2 * 1024**2
@@ -181,6 +182,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
         openapi_url="/api/openapi.json",
     )
+    app.include_router(taxonomy_router(catalog))
     app.state.catalog, app.state.jobs = catalog, jobs
     app.add_middleware(LocalGuard, max_upload_bytes=settings.max_upload_bytes)
 

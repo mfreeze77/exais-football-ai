@@ -13,6 +13,7 @@ from .config import Settings
 from .db import Database
 from .media import MediaError, generate_thumbnail, probe_video
 from .models import ClipPatch
+from .tagging import canonical_tags
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".mkv", ".avi", ".webm"}
 EDITABLE = {
@@ -213,18 +214,23 @@ class Catalog:
             )
             parameters.append(filters["player_id"])
         if filters.get("tag"):
-            where.append("EXISTS(SELECT 1 FROM clip_tags t WHERE t.clip_id=c.id AND t.tag=?)")
-            parameters.append(" ".join(filters["tag"].casefold().split()))
+            where.append("""EXISTS(SELECT 1 FROM clip_tags t WHERE t.clip_id=c.id AND t.tag=
+                COALESCE((SELECT n.name FROM tag_names a JOIN tag_names n
+                ON n.tag_id=a.tag_id AND n.is_canonical=1 WHERE a.name=?),?))""")
+            parameters.extend([" ".join(filters["tag"].casefold().split())] * 2)
         if filters.get("q"):
             query = filters["q"].replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
             like = f"%{query}%"
             where.append("""(c.title LIKE ? ESCAPE '\\' OR c.description LIKE ? ESCAPE '\\'
                 OR a.filename LIKE ? ESCAPE '\\'
                 OR EXISTS(SELECT 1 FROM clip_tags t
-                          WHERE t.clip_id=c.id AND t.tag LIKE ? ESCAPE '\\')
+                          WHERE t.clip_id=c.id AND (t.tag LIKE ? ESCAPE '\\'
+                          OR EXISTS(SELECT 1 FROM tag_names n JOIN tag_names a
+                          ON a.tag_id=n.tag_id WHERE n.name=t.tag AND n.is_canonical=1
+                          AND a.name LIKE ? ESCAPE '\\')))
                 OR EXISTS(SELECT 1 FROM notes n
                           WHERE n.clip_id=c.id AND n.body LIKE ? ESCAPE '\\'))""")
-            parameters.extend([like] * 5)
+            parameters.extend([like, like, like, like, f"%{query.casefold()}%", like])
         clause = " WHERE " + " AND ".join(where)
         with self.db.connection() as connection:
             total = connection.execute(
@@ -247,6 +253,8 @@ class Catalog:
         changes.pop("version")
         if not changes:
             return current
+        if "tags" in changes:
+            changes["tags"] = canonical_tags(connection, changes["tags"])
         updated = {**current, **changes}
         if not 0 <= updated["start_seconds"] < updated["end_seconds"] <= current["source_duration"]:
             raise CatalogError(

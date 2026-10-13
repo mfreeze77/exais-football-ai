@@ -1,5 +1,11 @@
 # Exais Football
 
+**EFA-017 adds optional [tag groups, aliases, and presets](docs/TAG_TAXONOMY.md).**
+Open **Tags & presets** to organize free-text vocabulary, build reusable label sets,
+and preview canonical renames or mappings. Existing film and history are preserved;
+schema-1 catalogs receive a database-only recovery snapshot before the additive upgrade.
+
+
 **Your clips, tightened and organized for the next film session.**
 
 Exais is a local American-football film library. Import the shorter clips you already make, choose their in/out points, add football labels and coaching notes, then find them again by game, player, phase, tag, or review status. Original footage stays intact. Export a selected interval as an MP4 when you need a separate file.

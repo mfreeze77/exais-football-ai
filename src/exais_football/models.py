@@ -7,6 +7,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from .tagging import normalize_tag
+
 Phase = Literal["offense", "defense", "special_teams", "other"]
 ReviewStatus = Literal["new", "review", "approved", "needs_work"]
 Title = Annotated[str, Field(min_length=1, max_length=240)]
@@ -49,10 +51,7 @@ class ClipPatch(Contract):
     def normalize_tags(cls, value):
         if value is None:
             return value
-        normalized = sorted({" ".join(tag.casefold().split()) for tag in value})
-        if any(not tag or len(tag) > 64 or "\x00" in tag for tag in normalized):
-            raise ValueError("Tags must contain 1 to 64 characters")
-        return normalized
+        return sorted({normalize_tag(tag) for tag in value})
 
     @model_validator(mode="after")
     def reject_null_updates(self):

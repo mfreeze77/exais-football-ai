@@ -67,6 +67,9 @@ def main() -> None:
                 "/static/review.js": "javascript",
                 "/static/api.js": "javascript",
                 "/static/ui.js": "javascript",
+                "/static/taxonomy.js": "javascript",
+                "/static/taxonomy.css": "text/css",
+                "/static/tag-input.js": "javascript",
             }
             for route, media_type in assets.items():
                 with urllib.request.urlopen(origin + route, timeout=5) as response:

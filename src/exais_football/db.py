@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import sqlite3
+import time
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from pathlib import Path
+from uuid import uuid4
 
-SCHEMA_VERSION = 1
+from .tagging import migrate_v2
+
+SCHEMA_VERSION = 2
 SCHEMA = """
 BEGIN IMMEDIATE;
 CREATE TABLE IF NOT EXISTS games (
@@ -104,11 +108,75 @@ class Database:
             version = connection.execute("PRAGMA user_version").fetchone()[0]
             if version > SCHEMA_VERSION:
                 raise RuntimeError("This catalog uses a newer schema; upgrade the application")
-            connection.execute("PRAGMA journal_mode=WAL")
-            if version == 0:
-                connection.executescript(SCHEMA)
+            self._enable_wal(connection)
+            # Recheck under a writer lock, including fresh databases. executescript
+            # would commit the lock first and could reset a concurrently migrated DB.
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                current = connection.execute("PRAGMA user_version").fetchone()[0]
+                if current == 0:
+                    for statement in SCHEMA.split(";"):
+                        statement = statement.strip()
+                        if statement and statement not in {"BEGIN IMMEDIATE", "COMMIT"}:
+                            connection.execute(statement)
+                    migrate_v2(connection)
+                elif current == 1:
+                    self._backup_v1()
+                    migrate_v2(connection)
+                elif current != SCHEMA_VERSION:
+                    raise RuntimeError("Unsupported catalog schema; migration was stopped")
+                connection.commit()
+            except BaseException:
+                connection.rollback()
+                raise
         finally:
             connection.close()
+
+    @staticmethod
+    def _enable_wal(connection: sqlite3.Connection) -> None:
+        """Retry only transient BUSY results before beginning any transaction.
+
+        SQLite may bypass its busy handler while switching journal modes. Keep
+        each attempt short and restore the normal query timeout on every exit.
+        """
+        previous_timeout = int(connection.execute("PRAGMA busy_timeout").fetchone()[0])
+        deadline = time.monotonic() + 10.0
+        connection.execute("PRAGMA busy_timeout=100")
+        try:
+            while True:
+                try:
+                    mode = connection.execute("PRAGMA journal_mode=WAL").fetchone()[0]
+                    if mode.lower() != "wal":
+                        raise RuntimeError("This catalog requires SQLite WAL journal support")
+                    return
+                except sqlite3.OperationalError as exc:
+                    code = getattr(exc, "sqlite_errorcode", 0) & 0xFF
+                    remaining = deadline - time.monotonic()
+                    if code != sqlite3.SQLITE_BUSY or remaining <= 0:
+                        raise
+                    time.sleep(min(0.05, remaining))
+        finally:
+            connection.execute(f"PRAGMA busy_timeout={previous_timeout}")
+
+    def _backup_v1(self) -> None:
+        """Consistent database-only recovery point, never a full film backup.
+
+        The migration connection holds the write lock. A separate read connection
+        uses SQLite's backup API so WAL pages are included without copying a live DB.
+        """
+        path = self.path.with_name(f"catalog.pre-taxonomy-v2.{uuid4()}.sqlite3")
+        try:
+            path.touch(mode=0o600, exist_ok=False)
+            with (
+                closing(sqlite3.connect(self.path)) as source,
+                closing(sqlite3.connect(path)) as target,
+            ):
+                source.backup(target)
+                if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                    raise RuntimeError("The pre-migration catalog backup failed verification")
+        except BaseException:
+            path.unlink(missing_ok=True)
+            raise
 
     def _open(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path, timeout=10, isolation_level=None)
